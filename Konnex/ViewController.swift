@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import Sodium
 
 import os.log
 
@@ -24,10 +24,10 @@ enum UnlockState {
 
 class ViewController: UIViewController {
     var state = UnlockState.waitForConnect
-    var keyPair = Box.KeyPair(publicKey: Bytes(count:0), secretKey: Bytes(count:0))  // Fake/invalid keypair
+    var keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))  // Fake/invalid keypair
     var phone_nonce = Data()
     var lock_nonce = Data()
-    var beforeNmKey = Bytes(count:0)
+    var beforeNmKey = Bytes([])
     var counter = UInt64(0)
     
     override func viewDidLoad() {
@@ -151,12 +151,12 @@ extension ViewController: UcBlePeripheralDelegate {
     }
     func didFailToConnect(_ peripheral: UcBlePeripheral, error: Error?) {
         os_log(.info, log: logger, "didFailToConnect(%{public}s)", peripheral.identifier.description)
-        keyPair = Box.KeyPair(publicKey: Bytes(count:0), secretKey: Bytes(count:0))
+        keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))
         UcBleCentral.sharedInstance.scan()
     }
     func didDisconnect(_ peripheral: UcBlePeripheral, error: Error?) {
         os_log(.info, log: logger, "didDisconnect(%{public}s)", peripheral.identifier.description)
-        keyPair = Box.KeyPair(publicKey: Bytes(count:0), secretKey: Bytes(count:0))
+        keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))
         UcBleCentral.sharedInstance.scan()
     }
 }
