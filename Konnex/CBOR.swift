@@ -47,8 +47,31 @@ extension Packable {
   }
 }
 
+
+enum CBORType {
+    case float64
+    case float32
+    case uint64
+    case uint32
+    case uint16
+    case uint8
+    case int64
+    case int32
+    case int16
+    case int8
+    case dictionary
+    case array
+    case bool
+    case data
+    case string
+    case `nil`
+    case undefined
+    case unknown
+}
+
 fileprivate protocol CBOREncodable {
   func toCBOR() throws -> Data
+    func type() -> CBORType
 }
 
 extension Float64: CBOREncodable {
@@ -57,6 +80,7 @@ extension Float64: CBOREncodable {
     r.append(self.pack(byteOrder: ByteOrder.bigEndian))
     return r
   }
+    func type() -> CBORType { return .float64 }
 }
 
 
@@ -66,12 +90,14 @@ extension Float32: CBOREncodable {
     r.append(self.pack(byteOrder: ByteOrder.bigEndian))
     return r
   }
+    func type() -> CBORType { return .float32 }
 }
 
 extension Bool: CBOREncodable {
   func toCBOR() throws -> Data {
     return CBOR.encode(tag: CBOR.Tag.prim, special: (self ? 21 : 20))
   }
+    func type() -> CBORType { return .bool }
 }
 
 extension Array: CBOREncodable {
@@ -83,6 +109,7 @@ extension Array: CBOREncodable {
     }
     return r
   }
+    func type() -> CBORType { return .array }
 }
 
 extension Dictionary: CBOREncodable {
@@ -96,12 +123,21 @@ extension Dictionary: CBOREncodable {
     }
     return r
   }
+    func type() -> CBORType { return .dictionary }
 }
 extension AnyHashable: CBOREncodable {
   func toCBOR() throws -> Data {
     guard let v = self.base as? CBOREncodable else { throw CBORError.nonEncodable }
     return try v.toCBOR()
   }
+    func type() -> CBORType {
+        if let b = self.base as? CBOREncodable {
+          return b.type()
+        }
+        else {
+            return .unknown
+        }
+    }
 }
 
 extension Data: CBOREncodable {
@@ -110,6 +146,9 @@ extension Data: CBOREncodable {
     r.append(self)
     return r
   }
+    func type() -> CBORType {
+        return .data
+    }
 }
 
 extension String: CBOREncodable {
@@ -118,27 +157,32 @@ extension String: CBOREncodable {
     r.append(self.data(using: .utf8)!)
     return r
   }
+    func type() -> CBORType { return .string }
 }
 
 extension UInt64: CBOREncodable {
   func toCBOR() throws -> Data {
     return CBOR.encode(tag: CBOR.Tag.unsigned, count: self)
   }
+    func type() -> CBORType { return .uint64 }
 }
 extension UInt32: CBOREncodable {
   func toCBOR() throws -> Data {
     return CBOR.encode(tag: CBOR.Tag.unsigned, count: UInt64(self))
   }
+    func type() -> CBORType { return .uint32 }
 }
 extension UInt16: CBOREncodable {
   func toCBOR() throws -> Data {
     return CBOR.encode(tag: CBOR.Tag.unsigned, count: UInt64(self))
   }
+    func type() -> CBORType { return .uint16 }
 }
 extension UInt8: CBOREncodable {
   func toCBOR() throws -> Data {
     return CBOR.encode(tag: CBOR.Tag.unsigned, count: UInt64(self))
   }
+    func type() -> CBORType { return .uint8 }
 }
 extension Int64: CBOREncodable {
   func toCBOR() throws -> Data {
@@ -149,6 +193,7 @@ extension Int64: CBOREncodable {
       return CBOR.encode(tag: CBOR.Tag.unsigned, count: UInt64(self))
     }
   }
+    func type() -> CBORType { return .int64 }
 }
 extension Int32: CBOREncodable {
   func toCBOR() throws -> Data {
@@ -159,6 +204,7 @@ extension Int32: CBOREncodable {
       return CBOR.encode(tag: CBOR.Tag.unsigned, count: UInt64(self))
     }
   }
+    func type() -> CBORType { return .int32 }
 }
 extension Int16: CBOREncodable {
   func toCBOR() throws -> Data {
@@ -169,6 +215,7 @@ extension Int16: CBOREncodable {
       return CBOR.encode(tag: CBOR.Tag.unsigned, count: UInt64(self))
     }
   }
+    func type() -> CBORType { return .int16 }
 }
 extension Int8: CBOREncodable {
   func toCBOR() throws -> Data {
@@ -179,6 +226,7 @@ extension Int8: CBOREncodable {
       return CBOR.encode(tag: CBOR.Tag.unsigned, count: UInt64(self))
     }
   }
+    func type() -> CBORType { return .int8 }
 }
 
 class CBOR {  // Class just to get namespace
@@ -351,7 +399,23 @@ class CBOR {  // Class just to get namespace
       }
       
     case .tag:
-      throw CBORError.badSyntax
+        switch data[0] & 0x1f {
+        case 1:
+            var date: Date
+            let (item, remaining) = try decodeOneKey(data.subdata(in: 1..<data.count))
+            switch (item as CBOREncodable).type() {
+            case .float64, .float32:
+               date = Date(timeIntervalSince1970: TimeInterval(item as! Double))
+            case .uint64, .uint32, .uint16, .uint8, .int64, .int32, .int16, .int8:
+               date = Date(timeIntervalSince1970: TimeInterval(item as! Int))
+            default:
+               throw CBORError.badSyntax
+            }
+            return (date, remaining)
+        default:
+            throw CBORError.badSyntax
+        }
+      
       
     case .prim:
       switch data[0] & 0x1f {
@@ -492,6 +556,12 @@ class CBOR {  // Class just to get namespace
       case .nil: return CBOR.encode(tag: CBOR.Tag.prim, special: 22)
       case .undefined: return CBOR.encode(tag: CBOR.Tag.prim, special: 23)
       }
+    }
+    func type() -> CBORType {
+        switch self {
+        case .nil: return .nil
+        case .undefined: return .undefined
+        }
     }
   }
 }

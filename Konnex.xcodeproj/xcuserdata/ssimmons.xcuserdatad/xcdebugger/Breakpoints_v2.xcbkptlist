@@ -9,14 +9,46 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Konnex/UcBle.swift"
-            timestampString = "586464715.4310679"
+            filePath = "Konnex/CBOR.swift"
+            timestampString = "586738088.740411"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "214"
-            endingLineNumber = "214"
-            landmarkName = "sendNext()"
+            startingLineNumber = "402"
+            endingLineNumber = "402"
+            landmarkName = "decodeOne(_:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Konnex.CBOR.(decodeOne in _D715FD06139C9B7A350209FCEFCD2B26)(Foundation.Data) throws -&gt; (Any, Foundation.Data)"
+                  moduleName = "Konnex"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ssimmons/uc/konnex/ios/Konnex/Konnex/CBOR.swift"
+                  timestampString = "586732622.67021"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "402"
+                  endingLineNumber = "402"
+                  offsetFromSymbolStart = "9744">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Konnex.CBOR.(decodeOne in _D715FD06139C9B7A350209FCEFCD2B26)(Foundation.Data) throws -&gt; (Any, Foundation.Data)"
+                  moduleName = "Konnex"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ssimmons/uc/konnex/ios/Konnex/Konnex/CBOR.swift"
+                  timestampString = "586732622.6721129"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "402"
+                  endingLineNumber = "402"
+                  offsetFromSymbolStart = "9760">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
