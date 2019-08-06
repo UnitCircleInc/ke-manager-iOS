@@ -2,8 +2,7 @@
 //  AppDelegate.swift
 //  Konnex
 //
-//  Created by Sean Simmons on 2019-07-22.
-//  Copyright © 2019 Unit Circle Inc. All rights reserved.
+//  Copyright © 2019 Konnex Enterprises Inc. All rights reserved.
 //
 
 import UIKit
