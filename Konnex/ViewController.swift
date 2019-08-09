@@ -26,13 +26,18 @@ func fmtDiff (_ diff : Double) -> String {
 class ViewController: UIViewController {
     @IBOutlet weak var requestKeyButton: UIButton!
     @IBOutlet weak var logArea: UITextView!
+    @IBOutlet weak var contactSiteManager: UILabel!
+    @IBOutlet weak var status: UILabel!
     var validEndDate : Date?
+    var requestAttr : [NSAttributedString.Key : Any]?
+    var statusAttr: [NSAttributedString.Key : Any]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.view = self
-        
+        requestAttr = requestKeyButton.attributedTitle(for: .normal)?.attributes(at: 0, effectiveRange: nil)
+        statusAttr = status.attributedText?.attributes(at: 0, effectiveRange: nil)
         let _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { timer in
             DispatchQueue.main.async {
                 self.updateButton()
@@ -44,16 +49,37 @@ class ViewController: UIViewController {
         if let ved = validEndDate {
             let rem = ved.timeIntervalSince1970 - Date().timeIntervalSince1970
             if rem < 0.0 {
-                requestKeyButton.setTitle("Request Key", for: .normal)
+                let t = NSAttributedString(string: "Click here to pay", attributes: requestAttr)
+                requestKeyButton.setAttributedTitle(t, for: .normal)
+                requestKeyButton.isHidden = false
+                contactSiteManager.isHidden = false
                 validEndDate = nil
             }
             else {
-                requestKeyButton.setTitle(fmtDiff(rem), for: .normal)
+                requestKeyButton.isHidden = true
+                contactSiteManager.isHidden = true
             }
         }
         else {
-            requestKeyButton.setTitle("Request Key", for: .normal)
+            let t = NSAttributedString(string: "Click here to pay", attributes: requestAttr)
+            requestKeyButton.setAttributedTitle(t, for: .normal)
+            requestKeyButton.isHidden = false
+            contactSiteManager.isHidden = false
         }
+//
+//        if let ved = validEndDate {
+//            let rem = ved.timeIntervalSince1970 - Date().timeIntervalSince1970
+//            if rem < 0.0 {
+//                requestKeyButton.setTitle("Request Key", for: .normal)
+//                validEndDate = nil
+//            }
+//            else {
+//                requestKeyButton.setTitle(fmtDiff(rem), for: .normal)
+//            }
+//        }
+//        else {
+//            requestKeyButton.setTitle("Request Key", for: .normal)
+//        }
     }
     
     func appendLog(_ text: String) {
@@ -68,7 +94,23 @@ class ViewController: UIViewController {
         }
     }
     
+    func locked() {
+        DispatchQueue.main.async {
+            self.status.attributedText = NSAttributedString(string: "Unit 101 - Locked", attributes: self.statusAttr)
+        }
+    }
+    
+    func unlocked() {
+        DispatchQueue.main.async {
+            self.status.attributedText = NSAttributedString(string: "Unit 101 - Unlocked", attributes: self.statusAttr)
+        }
+    }
+    
     @IBAction func requestKeyButtonPressed(_ sender: UIButton) {
+        var attr = requestAttr
+        attr?.removeValue(forKey: .underlineStyle)
+        let t = NSAttributedString(string: "Processing...", attributes: attr)
+        requestKeyButton.setAttributedTitle(t, for: .normal)
         let url = URL(string: "http://159.203.26.51:8001/genkey")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
@@ -152,8 +194,11 @@ class ViewController: UIViewController {
             }
  
             self.validEndDate = validEnd
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.setUnlockKey(key)
+            
+            DispatchQueue.main.async() {
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.setUnlockKey(key)
+            }
 
             self.appendLog("info: successfully obtained new key")
             let formattedDate = DateFormatter.localizedString(from: validEnd, dateStyle: .short, timeStyle: .long)

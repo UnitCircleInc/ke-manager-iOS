@@ -193,14 +193,15 @@ extension AppDelegate: UcBlePeripheralDelegate {
             if let result = sodium.box.open(authenticatedCipherText: Bytes(data), beforenm: beforeNmKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
                 if result.count == 1 && result[0] == UInt8(ascii: "O") {
                     os_log(.info, log: appLogger, "We oppend it!")
-                    view?.appendLog("info: unlock success!")
+                    view?.unlocked()
                 }
             }
-            peripheral.disconnect(UcBleError.protocolError)
+            //peripheral.disconnect(UcBleError.protocolError)
             state = .done
         case .done:
-            state = .waitForConnect
-            peripheral.disconnect(UcBleError.protocolError)
+            state = .done
+            //state = .waitForConnect
+            //peripheral.disconnect(UcBleError.protocolError)
         }
         
     }
@@ -216,6 +217,8 @@ extension AppDelegate: UcBlePeripheralDelegate {
         UcBleCentral.sharedInstance.scan()
     }
     func didDisconnect(_ peripheral: UcBlePeripheral, error: Error?) {
+        state = .waitForConnect
+        view?.locked()
         os_log(.info, log: appLogger, "didDisconnect(%{public}s)", peripheral.identifier.description)
         if state != .done {
             view?.appendLog("error: unlock failed!")
