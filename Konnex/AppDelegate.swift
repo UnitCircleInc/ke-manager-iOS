@@ -217,12 +217,12 @@ extension AppDelegate: UcBlePeripheralDelegate {
         UcBleCentral.sharedInstance.scan()
     }
     func didDisconnect(_ peripheral: UcBlePeripheral, error: Error?) {
-        state = .waitForConnect
         view?.locked()
         os_log(.info, log: appLogger, "didDisconnect(%{public}s)", peripheral.identifier.description)
         if state != .done {
             view?.appendLog("error: unlock failed!")
         }
+        state = .waitForConnect
         keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))
         UcBleCentral.sharedInstance.scan()
     }
