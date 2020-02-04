@@ -276,7 +276,7 @@ protocol UcBleCentralDelegate: class {
 class UcBleCentral: NSObject, CBCentralManagerDelegate {
     weak var delegate: UcBleCentralDelegate?
     private var manager: CBCentralManager?
-    private var active: Bool = false
+    var active: Bool = false
     private var knownPeripherals: [UUID: UcBlePeripheral] = [:]
     
     static let sharedInstance = UcBleCentral()
@@ -315,6 +315,7 @@ class UcBleCentral: NSObject, CBCentralManagerDelegate {
         case .poweredOn:
             active = true
             delegate?.didBecomeActive()
+            
        default:
             active = false
             delegate?.didBecomeInactive()

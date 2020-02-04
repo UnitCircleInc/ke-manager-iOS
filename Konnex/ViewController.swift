@@ -107,12 +107,12 @@ class ViewController: UIViewController {
     }
     
     @IBAction func requestKeyButtonPressed(_ sender: UIButton) {
-        #if false
+        #if true
         var attr = requestAttr
         attr?.removeValue(forKey: .underlineStyle)
         let t = NSAttributedString(string: "Processing...", attributes: attr)
         requestKeyButton.setAttributedTitle(t, for: .normal)
-        let url = URL(string: "http://159.203.26.51:8001/genkey")!
+        let url = URL(string: "http://qubyte.ca:8001/genkey")! //http://159.203.26.51:8001/genkey")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         

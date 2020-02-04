@@ -4,10 +4,11 @@
 //
 //  Copyright © 2019 Konnex Enterprises Inc. All rights reserved.
 //
-
+// APN Token: 3a5e772e51e0611d7318ac2c657dcf9b84f11f3117a958ea85b9679b877eb0b2
 import UIKit
 import Sodium
 import os.log
+import UserNotifications
 
 let sodium = Sodium()
 
@@ -40,8 +41,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        os_log(.default, log: appLogger, "application:didFinishLaunchingWithOpetions")
+        os_log(.default, log: appLogger, "application:didFinishLaunchingWithOptions: %{public}s", launchOptions?.description ?? "Null")
         UcBleCentral.sharedInstance.delegate = self
+        registerForPushNotifications()
+        
+        let notificationOption = launchOptions?[.remoteNotification]
+        if let notification = notificationOption as? [String: AnyObject],
+            let aps = notification["aps"] as? [String: AnyObject] {
+            os_log(.default, log: appLogger, "notification aps: %{public}s", aps.description)
+        }
         return true
     }
 
@@ -56,6 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         os_log(.default, log: appLogger, "applicationDidEnterBackground")
+        stopScanning()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -66,8 +75,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         os_log(.default, log: appLogger, "applicationDidBecomeActive")
-        startScanning()
-    }
+        if UcBleCentral.sharedInstance.active && !scanning {
+            startScanning()
+        }
+     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
@@ -76,7 +87,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func setUnlockKey(_ key: Data) {
         unlockKey = key
-        os_log(.info, log: appLogger, "key: %{public}s", unlockKey!.encodeHex())
+        os_log(.default, log: appLogger, "key: %{public}s", unlockKey!.encodeHex())
     }
     
     func startScanning() {
@@ -92,8 +103,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             scanning = false
         }
     }
+    
+    func getNotificationSettings() {
+        UNUserNotificationCenter.current().getNotificationSettings {
+            settings in
+            os_log(.default, log: appLogger, "Notification settings: %{public}s", settings.description)
+            guard settings.authorizationStatus == .authorized else { return }
+            DispatchQueue.main.async {
+                os_log(.default, log: appLogger, "Calling registerForRemoteNotifications")
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
+    }
+    
+    func registerForPushNotifications() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) {
+            [weak self] granted, error in
+            os_log(.default, log: appLogger, "Permission granted: %{public}s", granted.description)
+            guard granted else { return }
+            self?.getNotificationSettings()
+        }
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data)}
+        let token = tokenParts.joined()
+        os_log(.default, log: appLogger, "Device Token: %{public}s", token)
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        os_log(.default, log: appLogger, "Failed to register: %{public}s", error.localizedDescription)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        guard let aps = userInfo["aps"] as? [String: AnyObject] else {
+            completionHandler(.failed)
+            return
+        }
+        if aps["content-available"] as? Int == 1 {
+            DispatchQueue.main.async {  // TODO This should call should run in background - background fetch - perhaps we send key in push
+                os_log(.default, log: appLogger, "received silient notification userInfo: %{public}s", userInfo.description)
+                completionHandler(.noData)  // TODO This should call with .newData if fetching resulted in new key
+            }
+        }
+        else {
+            os_log(.default, log: appLogger, "received notification userInfo: %{public}s", userInfo.description)
+            completionHandler(.noData)
+        }
+    }
 }
-
 
 extension AppDelegate: UcBleCentralDelegate {
     func didDiscover(_ peripheral: UcBlePeripheral) {
@@ -138,7 +196,7 @@ let phone_sk = Bytes([99, 50, 129, 181, 248, 203, 92, 93, 84, 132, 97, 49, 102, 
 
 extension AppDelegate: UcBlePeripheralDelegate {
     func didReceive(_ peripheral: UcBlePeripheral, data: Data) {
-        os_log(.info, log: appLogger, "rx: %{public}s", data.encodeHex())
+        os_log(.default, log: appLogger, "rx: %{public}s", data.encodeHex())
         switch state {
         case .waitForConnect:
             os_log(.error, log: appLogger, "Received BLE data while in state waitForConnect")
@@ -177,7 +235,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
             counter += 1
             if let unlock_nonce = sodium.box.open(authenticatedCipherText: Bytes(data), beforenm: beforeNmKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
                 let sig = sodium.sign.sign(message: unlock_nonce, secretKey: phone_sk)!
-                os_log(.info, log: appLogger, "sig: %{public}s %d", Data(sig).encodeHex(), sig.count)
+                os_log(.default, log: appLogger, "sig: %{public}s %d", Data(sig).encodeHex(), sig.count)
                 peripheral.send(Data(sodium.box.seal(message: sig, beforenm: beforeNmKey, nonce: Bytes(phone_nonce + packUInt64(counter)))!))
                 state = .waitForUnlockOk
                 
@@ -192,7 +250,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
             counter += 1
             if let result = sodium.box.open(authenticatedCipherText: Bytes(data), beforenm: beforeNmKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
                 if result.count == 1 && result[0] == UInt8(ascii: "O") {
-                    os_log(.info, log: appLogger, "We oppend it!")
+                    os_log(.default, log: appLogger, "We oppend it!")
                     view?.unlocked()
                 }
             }
@@ -206,19 +264,19 @@ extension AppDelegate: UcBlePeripheralDelegate {
         
     }
     func didConnect(_ peripheral: UcBlePeripheral) {
-        os_log(.info, log: appLogger, "didConnect(%{public}s)", peripheral.identifier.description)
+        os_log(.default, log: appLogger, "didConnect(%{public}s)", peripheral.identifier.description)
         state = .waitForSessionNonceEphemeralKey
         keyPair = sodium.box.keyPair()!
         peripheral.send(Data(keyPair.publicKey))
     }
     func didFailToConnect(_ peripheral: UcBlePeripheral, error: Error?) {
-        os_log(.info, log: appLogger, "didFailToConnect(%{public}s)", peripheral.identifier.description)
+        os_log(.default, log: appLogger, "didFailToConnect(%{public}s)", peripheral.identifier.description)
         keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))
         UcBleCentral.sharedInstance.scan()
     }
     func didDisconnect(_ peripheral: UcBlePeripheral, error: Error?) {
         view?.locked()
-        os_log(.info, log: appLogger, "didDisconnect(%{public}s)", peripheral.identifier.description)
+        os_log(.default, log: appLogger, "didDisconnect(%{public}s)", peripheral.identifier.description)
         if state != .done {
             view?.appendLog("error: unlock failed!")
         }

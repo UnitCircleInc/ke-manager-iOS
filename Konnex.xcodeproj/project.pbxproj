@@ -70,6 +70,7 @@
 		79A8A6E822E659CC00F09A79 /* KonnexUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KonnexUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6EC22E659CC00F09A79 /* KonnexUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KonnexUITests.swift; sourceTree = "<group>"; };
 		79A8A6EE22E659CC00F09A79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		79CB9AEE23E8B4C1005295CA /* Konnex.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Konnex.entitlements; sourceTree = "<group>"; };
 		79E1CD3D22F1DFE200BEE62D /* UcBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UcBle.swift; sourceTree = "<group>"; };
 		79E1CD3F22F21EF000BEE62D /* UcUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UcUtils.swift; sourceTree = "<group>"; };
 		79E1CD4122F2219C00BEE62D /* Z85.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z85.swift; sourceTree = "<group>"; };
@@ -130,6 +131,7 @@
 		79A8A6CB22E659CA00F09A79 /* Konnex */ = {
 			isa = PBXGroup;
 			children = (
+				79CB9AEE23E8B4C1005295CA /* Konnex.entitlements */,
 				79E1CD4922F2259500BEE62D /* UcLogger.swift */,
 				79E1CD4222F2219C00BEE62D /* CBOR.swift */,
 				79E1CD4322F2219D00BEE62D /* COBS.swift */,
@@ -488,6 +490,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6CQYR849L3;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -512,6 +515,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6CQYR849L3;
 				FRAMEWORK_SEARCH_PATHS = (
