@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		79398173242941C900000BFE /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79398172242941C900000BFE /* ScanViewController.swift */; };
 		79A8A6CD22E659CA00F09A79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */; };
 		79A8A6CF22E659CA00F09A79 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6CE22E659CA00F09A79 /* ViewController.swift */; };
 		79A8A6D222E659CA00F09A79 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79A8A6D022E659CA00F09A79 /* Main.storyboard */; };
@@ -14,6 +15,11 @@
 		79A8A6D722E659CC00F09A79 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79A8A6D522E659CC00F09A79 /* LaunchScreen.storyboard */; };
 		79A8A6E222E659CC00F09A79 /* KonnexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6E122E659CC00F09A79 /* KonnexTests.swift */; };
 		79A8A6ED22E659CC00F09A79 /* KonnexUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6EC22E659CC00F09A79 /* KonnexUITests.swift */; };
+		79AC62F5242D511700356983 /* SurrogateCountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC62F4242D511700356983 /* SurrogateCountViewController.swift */; };
+		79C9496C242BBDCA00CE649C /* SurrogateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C9496B242BBDCA00CE649C /* SurrogateViewController.swift */; };
+		79C9496E242BE9E500CE649C /* DatePickerViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C9496D242BE9E500CE649C /* DatePickerViewCell.swift */; };
+		79CB9AF023F0BC8D005295CA /* LockTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB9AEF23F0BC8D005295CA /* LockTableViewCell.swift */; };
+		79CB9AF223F0C13B005295CA /* KeyTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB9AF123F0C13B005295CA /* KeyTableViewController.swift */; };
 		79E1CD3E22F1DFE200BEE62D /* UcBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD3D22F1DFE200BEE62D /* UcBle.swift */; };
 		79E1CD4022F21EF000BEE62D /* UcUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD3F22F21EF000BEE62D /* UcUtils.swift */; };
 		79E1CD4522F2219D00BEE62D /* Z85.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4122F2219C00BEE62D /* Z85.swift */; };
@@ -57,6 +63,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		79398172242941C900000BFE /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
 		79A8A6C922E659CA00F09A79 /* Konnex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Konnex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		79A8A6CE22E659CA00F09A79 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -70,7 +77,12 @@
 		79A8A6E822E659CC00F09A79 /* KonnexUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KonnexUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6EC22E659CC00F09A79 /* KonnexUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KonnexUITests.swift; sourceTree = "<group>"; };
 		79A8A6EE22E659CC00F09A79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		79AC62F4242D511700356983 /* SurrogateCountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurrogateCountViewController.swift; sourceTree = "<group>"; };
+		79C9496B242BBDCA00CE649C /* SurrogateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurrogateViewController.swift; sourceTree = "<group>"; };
+		79C9496D242BE9E500CE649C /* DatePickerViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewCell.swift; sourceTree = "<group>"; };
 		79CB9AEE23E8B4C1005295CA /* Konnex.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Konnex.entitlements; sourceTree = "<group>"; };
+		79CB9AEF23F0BC8D005295CA /* LockTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTableViewCell.swift; sourceTree = "<group>"; };
+		79CB9AF123F0C13B005295CA /* KeyTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTableViewController.swift; sourceTree = "<group>"; };
 		79E1CD3D22F1DFE200BEE62D /* UcBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UcBle.swift; sourceTree = "<group>"; };
 		79E1CD3F22F21EF000BEE62D /* UcUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UcUtils.swift; sourceTree = "<group>"; };
 		79E1CD4122F2219C00BEE62D /* Z85.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z85.swift; sourceTree = "<group>"; };
@@ -145,6 +157,12 @@
 				79A8A6D822E659CC00F09A79 /* Info.plist */,
 				79E1CD3D22F1DFE200BEE62D /* UcBle.swift */,
 				79E1CD3F22F21EF000BEE62D /* UcUtils.swift */,
+				79CB9AEF23F0BC8D005295CA /* LockTableViewCell.swift */,
+				79CB9AF123F0C13B005295CA /* KeyTableViewController.swift */,
+				79398172242941C900000BFE /* ScanViewController.swift */,
+				79C9496B242BBDCA00CE649C /* SurrogateViewController.swift */,
+				79C9496D242BE9E500CE649C /* DatePickerViewCell.swift */,
+				79AC62F4242D511700356983 /* SurrogateCountViewController.swift */,
 			);
 			path = Konnex;
 			sourceTree = "<group>";
@@ -307,15 +325,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				79C9496E242BE9E500CE649C /* DatePickerViewCell.swift in Sources */,
 				79E1CD4522F2219D00BEE62D /* Z85.swift in Sources */,
 				79E1CD4722F2219D00BEE62D /* COBS.swift in Sources */,
 				79A8A6CF22E659CA00F09A79 /* ViewController.swift in Sources */,
+				79AC62F5242D511700356983 /* SurrogateCountViewController.swift in Sources */,
 				79E1CD4022F21EF000BEE62D /* UcUtils.swift in Sources */,
 				79E1CD4622F2219D00BEE62D /* CBOR.swift in Sources */,
 				79A8A6CD22E659CA00F09A79 /* AppDelegate.swift in Sources */,
 				79E1CD4A22F2259500BEE62D /* UcLogger.swift in Sources */,
 				79E1CD3E22F1DFE200BEE62D /* UcBle.swift in Sources */,
+				79CB9AF023F0BC8D005295CA /* LockTableViewCell.swift in Sources */,
+				79CB9AF223F0C13B005295CA /* KeyTableViewController.swift in Sources */,
 				79E1CD4822F2219D00BEE62D /* CRC32C.swift in Sources */,
+				79398173242941C900000BFE /* ScanViewController.swift in Sources */,
+				79C9496C242BBDCA00CE649C /* SurrogateViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

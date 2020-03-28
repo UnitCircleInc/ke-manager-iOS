@@ -43,7 +43,11 @@ extension Packable {
   
   static func unpack(_ data: Data, byteOrder: ByteOrder) -> Self {
     let d = (byteOrder == ByteOrder.hostByteOrder) ? data : Data(data.reversed())
-    return UnsafeRawPointer(Array(d)).load(as: Self.self)
+    //return UnsafeRawPointer(Array(d)).load(as: Self.self)
+    let x: [UInt8] = d.map {UInt8($0)}
+    let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: x.count, alignment: MemoryLayout<UInt64>.alignment)
+    buffer.storeBytes(of: x, as: [UInt8].self)
+    return buffer.load(fromByteOffset: 0, as: Self.self)
   }
 }
 

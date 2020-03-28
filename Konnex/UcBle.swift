@@ -253,6 +253,10 @@ class UcBlePeripheral: NSObject, CBPeripheralDelegate {
         disconnectCause = cause
         manager.cancelPeripheralConnection(peripheral)
     }
+    
+    func lora_mac() -> Data? {
+        return advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data
+    }
 }
 
 
@@ -330,9 +334,10 @@ class UcBleCentral: NSObject, CBCentralManagerDelegate {
                         advertisementData: [String : Any],
                         rssi RSSI: NSNumber) {
         //os_log(.info, log: log, "centralMnagaer.didDiscover(%{public}s rssi: %f)", peripheral.identifier.description, RSSI.floatValue)
-        if let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String {
+        if let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String,
+            let lora_mac = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data {
             if name == "UnitCircle" {
-                os_log(.info, log: log, "centralMnagaer.didDiscover(%{public}s rssi: %f)", peripheral.identifier.description, RSSI.floatValue)
+                os_log(.info, log: log, "centralMnagaer.didDiscover(%{public}s rssi: %f mac: %{public}s)", peripheral.identifier.description, RSSI.floatValue, lora_mac.encodeHex())
                 let peripheral = UcBlePeripheral(peripheral, manager: self, advertisementData: advertisementData, rssi: RSSI)
                 knownPeripherals[peripheral.identifier] = peripheral
                 delegate?.didDiscover(peripheral)

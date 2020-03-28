@@ -26,13 +26,22 @@ protocol DataConvertible {
 extension DataConvertible {
   init?(data: Data) {
     guard data.count == MemoryLayout<Self>.size else { return nil }
-    self = UnsafeRawPointer(Array(data.reversed())).load(as: Self.self)
+    let d = Data(data.reversed())
+    //return UnsafeRawPointer(Array(d)).load(as: Self.self)
+    let x: [UInt8] = d.map {UInt8($0)}
+    let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: x.count, alignment: MemoryLayout<UInt64>.alignment)
+    buffer.storeBytes(of: x, as: [UInt8].self)
+    self = buffer.load(fromByteOffset: 0, as: Self.self)
+
+    //self = UnsafeRawPointer(Array(data.reversed())).load(as: Self.self)
     //self = Data(data.reversed()).withUnsafeBytes { $0.pointee }
   }
 
   var data: Data {
-    var value = self
-    return Data(Data(buffer: UnsafeBufferPointer(start: &value, count: 1)).reversed())
+    let r = [self].withUnsafeBufferPointer { Data(buffer: $0) }
+    return Data(r.reversed())
+    //var value = self
+    //return Data(Data(buffer: UnsafeBufferPointer(start: &value, count: 1)).reversed())
   }
 }
 extension UInt32 : DataConvertible { }

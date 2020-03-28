@@ -38,3 +38,42 @@ extension String {
         return data
     }
 }
+
+extension Data {
+    init?(base64URLEncoded string: String) {
+        self.init(base64Encoded: string.toggleBase64URLSafe(on: false))
+    }
+
+    func base64URLEncodedString() -> String {
+        return self.base64EncodedString().toggleBase64URLSafe(on: true)
+    }
+
+}
+
+extension String {
+    func toggleBase64URLSafe(on: Bool) -> String {
+        if on {
+            // Make base64 string safe for passing into URL query params
+            let base64url = self.replacingOccurrences(of: "/", with: "_")
+                .replacingOccurrences(of: "+", with: "-")
+                .replacingOccurrences(of: "=", with: "")
+            return base64url
+        } else {
+            // Return to base64 encoding
+            var base64 = self.replacingOccurrences(of: "_", with: "/")
+                .replacingOccurrences(of: "-", with: "+")
+            // Add any necessary padding with `=`
+            if base64.count % 4 != 0 {
+                base64.append(String(repeating: "=", count: 4 - base64.count % 4))
+            }
+            return base64
+        }
+    }
+}
+
+extension String {
+    func removePrefix(_ prefix: String) -> String {
+        guard self.hasPrefix(prefix) else { return self }
+        return String(self.dropFirst(prefix.count))
+    }
+}
