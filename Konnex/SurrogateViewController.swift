@@ -39,6 +39,7 @@ class SurrogateViewController: UITableViewController, UITextFieldDelegate {
     
     var validToDate: Date!
     var validCount: Int!
+    var lock: String?
     
     
     override func viewDidLoad() {
@@ -77,7 +78,13 @@ class SurrogateViewController: UITableViewController, UITextFieldDelegate {
     }
     
     @IBAction func sendPressed(_ sender: Any) {
+        print("to: \(sendToText.text!)")
+        print("expires: \(validToDate!.timeIntervalSince1970)")
+        print("count: \(validCount!)")
         print("Send pressed")
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.requestSurrogate(lock: lock!, surrogate: sendToText.text!, count: UInt64(validCount!), expiry: UInt64(validToDate!.timeIntervalSince1970))
         dismiss(animated: true)
     }
     

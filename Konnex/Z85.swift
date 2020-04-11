@@ -27,12 +27,11 @@ extension DataConvertible {
   init?(data: Data) {
     guard data.count == MemoryLayout<Self>.size else { return nil }
     let d = Data(data.reversed())
-    //return UnsafeRawPointer(Array(d)).load(as: Self.self)
-    let x: [UInt8] = d.map {UInt8($0)}
+    let x: [UInt8] = Array(d) //d.map {UInt8($0)}
     let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: x.count, alignment: MemoryLayout<UInt64>.alignment)
-    buffer.storeBytes(of: x, as: [UInt8].self)
+    buffer.copyBytes(from: x)
     self = buffer.load(fromByteOffset: 0, as: Self.self)
-
+    // return UnsafeRawPointer(Array(d)).load(as: Self.self))
     //self = UnsafeRawPointer(Array(data.reversed())).load(as: Self.self)
     //self = Data(data.reversed()).withUnsafeBytes { $0.pointee }
   }

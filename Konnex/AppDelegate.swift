@@ -13,8 +13,128 @@ import UserNotifications
 let sodium = Sodium()
 
 let appLogger = OSLog(subsystem: "ca.unitcircle.Konnex", category: "App")
+//
+//enum KeyKind {
+//    case tenant
+//    case master
+//    case surrogate
+//}
+//
+//struct RawLock {
+//    var corpCode: String
+//    var locationCode: String
+//    var pk: String
+//    var devEui: String
+//    var paidThruDate: Date
+//}
+//
+//struct RawKeyReq {
+//    var count: UInt64
+//    var kind: KeyKind
+//    var lock: RawLock
+//    var phone: String
+//    var key: Data
+//}
+//
+//struct RawKey {
+//    var loraMac: Data
+//    var key: Data
+//    var description: String
+//    var detailedDescription: String
+//    // var location: Location - TODO figure out how to encode a location sutiable for open maps
+//}
+//
+//struct RequestKeys: Codable, CBOREncodable {
+//    var phonePk: Data
+//    var apnToken: Data
+//    var konnexToken: Data
+//
+//    func toCBOR() throws -> Data {
+//      var r = CBOR.encode(tag: CBOR.Tag.map, count: UInt64(3))
+//        r.append(try "phone-pk".toCBOR())
+//        r.append(try phonePk.toCBOR())
+//        r.append(try "apn-token".toCBOR())
+//        r.append(try apnToken.toCBOR())
+//        r.append(try "konnex-token".toCBOR())
+//        r.append(try konnexToken.toCBOR())
+//      return r
+//    }
+//    func type() -> CBORType { return .dictionary }
+//    static func fromCBOR(_ data: Data) throws -> RequestKeys {
+//        let v = try CBOR.decode(data)
+//        guard let d = v[0] as? [String:Any] else { throw  CBORError.badSyntax }
+//        guard let pk = d["phone-pk"] as? Data else { throw CBORError.badSyntax }
+//        guard let at = d["apn-token"] as? Data else { throw CBORError.badSyntax }
+//        guard let kt = d["konnex-token"] as? Data else { throw CBORError.badSyntax }
+//        return RequestKeys(phonePk: pk, apnToken: at, konnexToken: kt)
+//    }
+//}
+//
+//struct RequestMaster {
+//    var phonePk: Data
+//    var konnexToken: Data
+//    var units: [ Data ]
+//}
+//
+//struct RawUnit {
+//    var name: String
+//    var id: Data
+//}
+//struct UnitsForLocation {
+//    var location: String
+//    var units: [ RawUnit ]
+//}
+//
+//struct Keys {
+//    var tenant: [ RawKey ]
+//    var master: [ RawKey ]
+//    var surrgate: [ RawKey ]
+//}
 
+// Things that need to be persisted as phone might get evicted.
+// * results of request-keys/request-master - this just needs to be cached for quick response
+//   see: https://developer.apple.com/library/archive/referencelibrary/GettingStarted/DevelopiOSAppsSwift/PersistData.html#//apple_ref/doc/uid/TP40015214-CH14-SW1
+//    https://www.hackingwithswift.com/example-code/strings/how-to-save-a-string-to-a-file-on-disk-with-writeto
+//   re-running app will request-keys again and update cache - persist in normal file system
+// * phone-pk and phone-sk - generated once for life time of app
+// * konnex-token - provided once on first launch and possibly returned in request-keys/request-master requests.
+// * apn-token - provided to app each time we re-launch by iOS
+//   see: https://medium.com/ios-os-x-development/securing-user-data-with-keychain-for-ios-e720e0f9a8e2
+//        https://github.com/jrendel/SwiftKeychainWrapper/blob/develop/SwiftKeychainWrapper/KeychainWrapper.swift
+//        https://developer.apple.com/documentation/security/keychain_services/keychain_items/adding_a_password_to_the_keychain
+//
 
+// The following is sent:
+//   * When a push is received
+//   * On initial app launch (which is assumed to have a konnexToken
+//   * On a significant location change - just in case push didn't work
+// Probably easier to send pushToken with every request
+// POST https://www.qubyte.ca/server/request-keys - returns all currently assigned keys for this phone
+//    Sign({ "phone-pk": phonePk, "apn-token": pushToken, "token": konnexToken }, phone_sk))
+//      -> {"tenant": [ { "lora-mac": Data, "key": Data, "detailedDescription": String, "description": String, "location": Location}, ...], ...}
+//         description - "Unit 102b"
+//         detailedDescription - might be "Lockers-R-Us 123 My Rd, Building 3"
+//         location - enough detail to show location in maps either text look up with address
+//         lora-mac - used when scanning bluetooth to determine which devices to connect to.
+//         key - the actual unlock key data
+//      Keys are presented in sections tenant, master, surrogate.
+//      Within sections they are ordered by the server - although we could reorder on phone based on description field
+//
+// The following is send when master keys are requested.  Server generates new keys and returns the updated list of active keys.
+// More than 1 key can be requested in a request to the server.
+// POST https://www.qubyte.ca/server/request-master - requests a new master key be assigned to this phone
+//    Z85(Sign(CBOR({"phone-pk": phone_pk, "units": [id1, id2, ...]}), phone_sk))
+//      CBOR(Z85(rsp)) -> [ { "key": Data, "desc": String, "kind": String, "lora-mac": Data}, ...] - returns all active keys
+//
+// The following is sent when a surrogate is requested.  It will return in a push to the surrogate.
+// POST https://www.qubyte.ca/server/request-surrogate - requests a new surrogate key be delivered for a lock
+//    Z85(Sign(CBOR({"phone-pk": phone_pk, "lock-pk": lock_pk, "surrogate": surrogate, "count": count, "expiry": expiry}), phone_sk))
+//       empty rsp.
+//
+// POST  https://www.qubyte.ca/server/request-units - requests all the units that this phone can request master keys for
+//    Sign({ "phone-pk": phonePk, "token": konnexToken }, phone_sk))
+//      CBOR(Z85(rsp)) -> [ {"corpcode": corpcode, "location": location, "unit": unit}, ...]
+//      CBOR(Z85(rsp)) -> { "location1": [ {"name": "unit1", "id": id1}, {"name": "unit2", "id": id2, ...], ... }
 
 enum UnlockState {
     case waitForConnect
@@ -36,11 +156,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var phone_pk: Bytes?
     var phone_sk: Bytes?
     var view : KeyTableViewController?
+    var masterView: MasterKeyTableViewController?
     var scanning = false
-    var keys: [String: [String: Any]] = [:]
+    var keys: [String: [String: Key]] = [:]
 
     var window: UIWindow?
-
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -60,7 +180,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
             process_invite(components.path.removePrefix("/device/"), sendapn: true)
         }
-
         return true
     }
 
@@ -86,6 +205,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         os_log(.default, log: appLogger, "applicationDidBecomeActive")
+        application.applicationIconBadgeNumber = 0
         if UcBleCentral.sharedInstance.active && !scanning {
             startScanning()
         }
@@ -134,9 +254,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         os_log(.default, log: appLogger, "Device Token: %{public}s", deviceToken.encodeHex())
         pushToken = deviceToken
-        let signingKeys = sodium.sign.keyPair()
-        phone_pk = signingKeys?.publicKey
-        phone_sk = signingKeys?.secretKey
+        
+        let tag = "ca.qubyte.keys".data(using: .utf8)!
+        let query : [String: Any] = [
+            kSecClass as String : kSecClassKey,
+            kSecAttrApplicationTag as String: tag,
+            kSecReturnData as String: true
+        ]
+        var result : AnyObject?
+        let status = withUnsafeMutablePointer(to: &result) { SecItemCopyMatching(query as CFDictionary, $0) }
+        switch status {
+        case errSecSuccess:
+            if let data = result as? Data,
+                let dec_item = try? CBOR.decode(data),
+                dec_item.count == 1,
+                let dec_dict = dec_item[0] as? [String: Any],
+                let pk = dec_dict["pk"] as? Data,
+                let sk = dec_dict["sk"] as? Data {
+                    phone_pk = Bytes(pk)
+                    phone_sk = Bytes(sk)
+                os_log(.default, log: appLogger, "Restored signing key: %{public}s", pk.encodeHex())
+            }
+            else {
+                os_log(.default, log: appLogger, "Unable to extract keys")
+            }
+        case errSecItemNotFound:
+            // Create a key - should only happen once
+            let signingKeys = sodium.sign.keyPair()
+            phone_pk = signingKeys?.publicKey
+            phone_sk = signingKeys?.secretKey
+            let data = try! CBOR.encode(["pk": Data(phone_pk!), "sk": Data(phone_sk!)])
+            let query : [String: Any] = [
+                kSecClass as String : kSecClassKey,
+                kSecAttrApplicationTag as String: tag,
+                kSecValueData as String: data
+            ]
+            let status = SecItemAdd(query as CFDictionary, nil)
+            if status != errSecSuccess {
+                os_log(.default, log: appLogger, "Unexpected return value for SecAddItem")
+            }
+            os_log(.default, log: appLogger, "Generated signing key: %{public}s", Data(phone_pk!).encodeHex())
+        default:
+            os_log(.default, log: appLogger, "Unexpected return value for SecItemCopyMatching")
+        }
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -180,22 +340,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if let dectoken = Data(base64URLEncoded: token),
            let push = pushToken {
-            var rsp: [String: Any]?
-            if sendapn {
-                rsp = ["phone-pk": Data(phone_pk!), "apn-token": push, "token": dectoken]
-            }
-            else {
-                rsp = ["phone-pk": Data(phone_pk!), "token": dectoken]
-            }
-            let msg = try! sodium.sign.sign(message: Bytes(CBOR.encode(rsp!)), secretKey: phone_sk!)!
-            os_log(.default, log: appLogger, "new token: %{public}s", Data(msg).encodeHex())
-            
-            
-            let url = URL(string: "https://www.qubyte.ca/server/request-keys")! //http://159.203.26.51:8001/genkey")!
+            let reqdata: [String: Any] = sendapn ? ["apn-token": push, "token": dectoken] : [:]
+            let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+            let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+            os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-keys data: %{public}s", Data(enc_req).encodeHex())
+            let url = URL(string: "https://www.qubyte.ca/api/v1/request-keys")!
             var req = URLRequest(url: url)
             req.httpMethod = "POST"
-               
-            req.httpBody = Data(msg).encodeZ85().data(using: .utf8)
+            req.httpBody = enc_req.encodeZ85().data(using: .utf8)
                    
             let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
                 if let error = error {
@@ -237,18 +389,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                    os_log(.error, log: appLogger, "error: COBR item not dictionary")
                    return
                 }
-                var newkeys: [String: [String: Any]] = [:]
+                var newkeys: [String: [String: Key]] = ["tenant": [:], "master": [:], "surrogate": [:]]
                 for item in enc4 {
                     if let key = item as? [String: Any],
                        let keydata = key["key"] as? Data,
-                       let keydesc = key["desc"] as? String,
+                       let keylock = key["lock"] as? String,
                        let keykind = key["kind"] as? String,
-                       let keymac = key["lora-mac"] as? Data,
-                       let deckeydata = try? CBOR.decode(keydata.subdata(in: 64..<keydata.count)),
-                       let keydetails = deckeydata[0] as? [String: Any],
-                       let lock_pk = keydetails["lock-pk"] as? Data {
-                        os_log(.default, log: appLogger, "received key: %{public}s lock: %{public}s mac: %{public}s", keydesc, lock_pk.encodeHex(), keymac.encodeHex())
-                        newkeys[keymac.encodeHex()] = ["desc": keydesc, "kind": keykind, "lock-pk": lock_pk, "key": keydata, "status": "locked"]
+                       let keydesc = key["description"] as? String,
+                       let keyaddress = key["address"] as? String,
+                       let keyunit = key["unit"] as? String {
+                        newkeys[keykind]![keyunit] = Key(key: keydata, lock_pk: keylock, kind: keykind, description: keydesc, address: keyaddress, unit: keyunit, status: "locked")
                     }
                 }
 
@@ -263,69 +413,76 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func requestMaster(corpcode: String, location: String, unit: String) {
-        let data: [String: Any] = ["phone-pk": Data(phone_pk!), "corpcode": corpcode, "location": location, "unit": unit]
-        let msg = try! sodium.sign.sign(message: Bytes(CBOR.encode(data)), secretKey: phone_sk!)!
-        os_log(.default, log: appLogger, "new token: %{public}s", Data(msg).encodeHex())
-        let url = URL(string: "https://www.qubyte.ca/server/request-master")!
-        
+    
+    func requestKeys() {
+        let reqdata: [String: Any] = [:]
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-keys data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/request-keys")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
-           
-        req.httpBody = Data(msg).encodeZ85().data(using: .utf8)
+        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
                
         let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
             if let error = error {
-               os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
-               return
+                os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
+                self.view?.updateKeysFailed()
+                return
             }
             guard let response = response as? HTTPURLResponse else {
-               os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
-               return
+                os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
+                self.view?.updateKeysFailed()
+                return
             }
             guard let data = data else {
-               os_log(.error, log: appLogger, "error: missing data")
-               return
+                os_log(.error, log: appLogger, "error: missing data")
+                self.view?.updateKeysFailed()
+                return
             }
             if response.statusCode != 200 {
-               os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
-               return
+                os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
+                self.view?.updateKeysFailed()
+                return
             }
             guard let enc = String(data: data, encoding: .utf8) else {
-               os_log(.error, log: appLogger, "error: data not utf8 encoded")
-               return
+                os_log(.error, log: appLogger, "error: data not utf8 encoded")
+                self.view?.updateKeysFailed()
+                return
             }
             guard let enc2 = enc.decodeZ85() else {
-               os_log(.error, log: appLogger, "error: data not z85 encoded")
-               return
+                os_log(.error, log: appLogger, "error: data not z85 encoded")
+                self.view?.updateKeysFailed()
+                return
             }
             guard let enc3 = try? CBOR.decode(enc2) else {
-               os_log(.error, log: appLogger, "error: unable to decode CBOR")
-               return
+                os_log(.error, log: appLogger, "error: unable to decode CBOR")
+                self.view?.updateKeysFailed()
+                return
             }
             os_log(.default, log: appLogger, "info: data %{public}s", enc3.description)
 
             if enc3.count != 1 {
-               os_log(.error, log: appLogger, "error: expecting only 1 CBOR item")
-               return
+                os_log(.error, log: appLogger, "error: expecting only 1 CBOR item")
+                self.view?.updateKeysFailed()
+                return
             }
 
             guard let enc4 = enc3[0] as? [Any] else {
-               os_log(.error, log: appLogger, "error: COBR item not dictionary")
-               return
+                os_log(.error, log: appLogger, "error: COBR item not dictionary")
+                self.view?.updateKeysFailed()
+                return
             }
-            var newkeys: [String: [String: Any]] = [:]
+            var newkeys: [String: [String: Key]] = ["tenant": [:], "master": [:], "surrogate": [:]]
             for item in enc4 {
                 if let key = item as? [String: Any],
                    let keydata = key["key"] as? Data,
-                   let keydesc = key["desc"] as? String,
+                   let keylock = key["lock"] as? String,
                    let keykind = key["kind"] as? String,
-                   let keymac = key["lora-mac"] as? Data,
-                   let deckeydata = try? CBOR.decode(keydata.subdata(in: 64..<keydata.count)),
-                   let keydetails = deckeydata[0] as? [String: Any],
-                   let lock_pk = keydetails["lock-pk"] as? Data {
-                    os_log(.default, log: appLogger, "received key: %{public}s lock: %{public}s mac: %{public}s", keydesc, lock_pk.encodeHex(), keymac.encodeHex())
-                    newkeys[keymac.encodeHex()] = ["desc": keydesc, "kind": keykind, "lock-pk": lock_pk, "key": keydata, "status": "locked"]
+                   let keydesc = key["description"] as? String,
+                   let keyaddress = key["address"] as? String,
+                   let keyunit = key["unit"] as? String {
+                    newkeys[keykind]![keyunit] = Key(key: keydata, lock_pk: keylock, kind: keykind, description: keydesc, address: keyaddress, unit: keyunit, status: "locked")
                 }
             }
 
@@ -335,17 +492,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         task.resume()
     }
-    func requestSurrogate(lock_pk: Data, surrogate: String, count: UInt64, expiry: UInt64) {
-        let data: [String: Any] = ["phone-pk": Data(phone_pk!), "lock-pk": lock_pk, "surrogate": surrogate, "count": count, "expiry": expiry]
-        let msg = try! sodium.sign.sign(message: Bytes(CBOR.encode(data)), secretKey: phone_sk!)!
-        os_log(.default, log: appLogger, "new token: %{public}s", Data(msg).encodeHex())
-        let url = URL(string: "https://www.qubyte.ca/server/request-surrogate")!
-        
+    
+    func requestMaster(_ locks: [String]) {
+        let reqdata: [String: Any] = ["locks": locks]
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-master data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/request-master")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
-           
-        req.httpBody = Data(msg).encodeZ85().data(using: .utf8)
+        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
                
+        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
+            if let error = error {
+               os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
+               return
+            }
+            guard let response = response as? HTTPURLResponse else {
+               os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
+               return
+            }
+            
+            if response.statusCode != 200 {
+               os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
+               return
+            }
+        }
+        task.resume()
+    }
+    
+    func requestSurrogate(lock: String, surrogate: String, count: UInt64, expiry: UInt64) {
+        let reqdata: [String: Any] = ["lock": lock, "surrogate": surrogate, "count": count, "expiry": expiry]
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-surrogate data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/request-surrogate")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
+
+        
         let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
             if let error = error {
                os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
@@ -361,7 +547,114 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         task.resume()
+    }
+    
+    func assignLockToUnit(_ unit: Unit, lock: Lock) {
+        let reqdata: [String: Any] = ["corp": unit.corp, "site": unit.site, "unit": unit.unit, "lock": lock.lock]
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/ data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/assign")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
+
         
+        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
+            if let error = error {
+               os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
+               return
+            }
+            guard let response = response as? HTTPURLResponse else {
+               os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
+               return
+            }
+            if response.statusCode != 200 {
+               os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
+               return
+            }
+        }
+        task.resume()
+    }
+    
+    func requestUnits() {
+        let reqdata: [String: Any] = [:]
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/units data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/units")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
+
+        
+        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
+            if let error = error {
+                self.masterView?.updateUnitsFailed()
+                os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
+                return
+            }
+            guard let response = response as? HTTPURLResponse else {
+                self.masterView?.updateUnitsFailed()
+                os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
+                return
+            }
+            guard let data = data else {
+               os_log(.error, log: appLogger, "error: missing data")
+               return
+            }
+            if response.statusCode != 200 {
+                self.masterView?.updateUnitsFailed()
+                os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
+                return
+            }
+            os_log(.default, log: appLogger, "rsp %{public}s", data.encodeHex())
+            
+            guard let enc = String(data: data, encoding: .utf8) else {
+                os_log(.error, log: appLogger, "error: data not utf8 encoded")
+                return
+            }
+            guard let enc2 = enc.decodeZ85() else {
+                os_log(.error, log: appLogger, "error: data not z85 encoded")
+                return
+            }
+            guard let enc3 = try? CBOR.decode(enc2) else {
+                os_log(.error, log: appLogger, "error: unable to decode CBOR")
+                return
+            }
+            os_log(.default, log: appLogger, "info: data %{public}s", enc3.description)
+
+            if enc3.count != 1 {
+                os_log(.error, log: appLogger, "error: expecting only 1 CBOR item")
+                return
+            }
+
+            guard let enc4 = enc3[0] as? [Any] else {
+                os_log(.error, log: appLogger, "error: COBR item not dictionary")
+                return
+            }
+            var newUnits: [String: [String: UnitDesc]] = [:]
+                 for item in enc4 {
+                     if let unitdesc = item as? [String: Any],
+                        let unit = unitdesc["unit"] as? String,
+                        let id = unitdesc["id"] as? String,
+                        let description = unitdesc["description"] as? String {
+                        if newUnits[description] == nil {
+                            newUnits[description] = [:]
+                            
+                        }
+                        if let lock = unitdesc["lock"] as? String {
+                            newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: lock)
+                        }
+                        else {
+                            newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: nil)
+                        }
+                 }
+             }
+            
+            self.masterView?.updateUnits(newUnits)
+        }
+        task.resume()
     }
 }
 
@@ -395,18 +688,6 @@ func packUInt64(_ v: UInt64) -> Data {
 func unpackUInt64(_ v: Data) -> UInt64 {
     return v.reversed().reduce(UInt64()) { $0 * 256 + UInt64($1)}
 }
-
-#if false
-#if true
-// sean1
-let phone_pk = Bytes([217, 118, 119, 112, 160, 224, 206, 62, 147, 28, 60, 8, 150, 159, 31, 94, 178, 237, 163, 198, 75, 241, 223, 100, 135, 49, 75, 234, 29, 198, 70, 236])
-let phone_sk = Bytes([2, 68, 197, 155, 170, 105, 125, 2, 173, 190, 108, 107, 30, 157, 243, 251, 130, 137, 219, 157, 174, 140, 42, 27, 251, 82, 25, 140, 167, 108, 190, 87, 217, 118, 119, 112, 160, 224, 206, 62, 147, 28, 60, 8, 150, 159, 31, 94, 178, 237, 163, 198, 75, 241, 223, 100, 135, 49, 75, 234, 29, 198, 70, 236])
-#else
-// sean2
-let phone_pk = Bytes([198, 128, 180, 226, 25, 41, 97, 185, 203, 186, 94, 112, 50, 134, 232, 180, 139, 222, 131, 32, 128, 176, 208, 119, 148, 132, 202, 135, 73, 105, 246, 40])
-let phone_sk = Bytes([99, 50, 129, 181, 248, 203, 92, 93, 84, 132, 97, 49, 102, 75, 17, 175, 201, 70, 96, 234, 177, 223, 19, 82, 124, 10, 110, 229, 58, 22, 82, 153, 198, 128, 180, 226, 25, 41, 97, 185, 203, 186, 94, 112, 50, 134, 232, 180, 139, 222, 131, 32, 128, 176, 208, 119, 148, 132, 202, 135, 73, 105, 246, 40])
-#endif
-#endif
 
 extension AppDelegate: UcBlePeripheralDelegate {
     func didReceive(_ peripheral: UcBlePeripheral, data: Data) {
@@ -483,7 +764,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
                         return
                     }
                     
-                    keys[lora_mac.encodeHex()]?["status"] = "unlocked"
+                    // TODO Fix me keys[lora_mac.encodeHex()]?["status"] = "unlocked"
                     view?.updateKeys(keys)
                 }
             }
@@ -516,7 +797,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
             return
         }
         
-        keys[lora_mac.encodeHex()]?["status"] = "locked"
+        // TODO Fix me keys[lora_mac.encodeHex()]?["status"] = "locked"
         view?.updateKeys(keys)
         os_log(.default, log: appLogger, "didDisconnect(%{public}s)", peripheral.identifier.description)
         if state != .done {

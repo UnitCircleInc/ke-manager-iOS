@@ -46,7 +46,7 @@ extension Packable {
     //return UnsafeRawPointer(Array(d)).load(as: Self.self)
     let x: [UInt8] = d.map {UInt8($0)}
     let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: x.count, alignment: MemoryLayout<UInt64>.alignment)
-    buffer.storeBytes(of: x, as: [UInt8].self)
+    buffer.copyBytes(from: x)
     return buffer.load(fromByteOffset: 0, as: Self.self)
   }
 }
@@ -73,7 +73,7 @@ enum CBORType {
     case unknown
 }
 
-fileprivate protocol CBOREncodable {
+protocol CBOREncodable {
   func toCBOR() throws -> Data
     func type() -> CBORType
 }
@@ -309,7 +309,7 @@ class CBOR {  // Class just to get namespace
     }
   }
   
-  static private func decodeOne(_ data: Data) throws -> (Any, Data) {
+  static func decodeOne(_ data: Data) throws -> (Any, Data) {
     guard data.count > 0 else { throw CBORError.insuffientData }
     switch Tag(rawValue: data[0] >> 5)! {
     case .unsigned:
@@ -458,7 +458,7 @@ class CBOR {  // Class just to get namespace
     return try v.toCBOR()
   }
   
-  static fileprivate func encode(tag: Tag, count: UInt64) -> Data {
+  static func encode(tag: Tag, count: UInt64) -> Data {
     if count < 24 {
        return Data([(tag.rawValue << 5) + UInt8(count)])
     }
@@ -540,7 +540,7 @@ class CBOR {  // Class just to get namespace
     }
   }
   
-  fileprivate enum Tag: UInt8 {
+  enum Tag: UInt8 {
     case unsigned
     case negative
     case bytes

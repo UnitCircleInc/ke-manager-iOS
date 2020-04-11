@@ -11,13 +11,13 @@ import AVFoundation
 import UIKit
 
 struct Unit: Codable {
+    var corp: String
+    var site: String
     var unit: String
-    var id: String
 }
 
 struct Lock: Codable {
     var lock: String
-    var id: String
 }
 
 class ScanViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
@@ -154,6 +154,10 @@ class ScanViewController: UIViewController, AVCaptureMetadataOutputObjectsDelega
         
         // TODO Send registration to Konnex Server
         print("Adding lock: \(lock.lock) to unit: \(unit.unit)")
+        DispatchQueue.main.async {
+          let appDelegate = UIApplication.shared.delegate as! AppDelegate
+          appDelegate.assignLockToUnit(unit, lock: lock)
+        }
         // Only show alert after confirmed - or display error if unable to add
         // Don't clear if error to allow someone to try adding again - incase of temp connectivity issues
         showAlertMsg(title: "Adding", message: "Lock: \(lock.lock)\nUnit: \(unit.unit)")
