@@ -10,11 +10,21 @@ import UIKit
 import os.log
 let mkLogger = OSLog(subsystem: "ca.unitcircle.Konnex", category: "MasterKey")
 
+public enum MyUIColor {
+    public static var label: UIColor {
+        if #available(iOS 13, *) {
+            return .label
+        }
+        return UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+    }
+}
+
 struct UnitDesc: Codable {
     var unit: String
     var id: String
     var selected: Bool
     var lock: String?
+    var battery: Double
 }
 
 class MasterKeyTableViewController: UITableViewController {
@@ -114,7 +124,7 @@ class MasterKeyTableViewController: UITableViewController {
         for item1 in units {
             newKeys[item1.key] = [:]
             for item2 in item1.value {
-                newKeys[item1.key]![item2.key] = UnitDesc(unit: item2.value.unit, id: item2.value.id, selected: false, lock: item2.value.lock)
+                newKeys[item1.key]![item2.key] = UnitDesc(unit: item2.value.unit, id: item2.value.id, selected: false, lock: item2.value.lock, battery: item2.value.battery)
             }
         }
         units = newKeys
@@ -143,7 +153,20 @@ class MasterKeyTableViewController: UITableViewController {
         let sortedKeys = units[section]!.keys.sorted()
         let key = sortedKeys[indexPath.row]
         cell.textLabel?.text = units[section]![key]?.unit
-        cell.textLabel?.textColor = units[section]![key]?.lock == nil ? UIColor.systemGray : UIColor.label
+        cell.textLabel?.textColor = units[section]![key]?.lock == nil ? UIColor.systemGray : MyUIColor.label
+        
+        if units[section]![key]!.battery < 25.0 {
+            let imageAttachment = NSTextAttachment()
+            imageAttachment.image = UIImage(named: "battery25")
+            imageAttachment.bounds = CGRect(x: 0, y: -5, width: imageAttachment.image!.size.width, height: imageAttachment.image!.size.height)
+            let attachmentString = NSAttributedString(attachment: imageAttachment)
+            cell.detailTextLabel?.attributedText = attachmentString
+        }
+        else {
+            cell.detailTextLabel?.text = ""
+            cell.detailTextLabel?.attributedText = nil
+            
+        }
         cell.accessoryType = units[section]![key]!.selected ? .checkmark : .none
         return cell
     }
@@ -161,7 +184,7 @@ class MasterKeyTableViewController: UITableViewController {
         let sortedKeys = units[section]!.keys.sorted()
         let key = sortedKeys[indexPath.row]
         let masterKey = units[section]![key]!
-        units[section]![key]! = UnitDesc(unit: masterKey.unit, id: masterKey.id, selected: !masterKey.selected, lock: masterKey.lock)
+        units[section]![key]! = UnitDesc(unit: masterKey.unit, id: masterKey.id, selected: !masterKey.selected, lock: masterKey.lock, battery: masterKey.battery)
         tableView.reloadRows(at: [indexPath], with: .automatic)
         tableView.deselectRow(at: indexPath, animated: true)
     }

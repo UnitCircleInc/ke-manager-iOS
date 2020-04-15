@@ -19,6 +19,12 @@ struct Key: Codable {
     var address: String      // Site address
     var unit: String         // The unit "name" at the site
     var status: String       // Current status - derived locally - but could also be updated by server
+    var log: [KeyLogItem]
+}
+
+struct KeyLogItem: Codable {
+    var date: Date
+    var event: String
 }
 
 enum Sections: Int {
@@ -43,6 +49,8 @@ class KeyTableViewController: UITableViewController {
     
     var keys: [String: [String:Key]] = [:]
     var selectedLock: String?
+    var selectedUnit: String?
+    var selectedLog: [KeyLogItem]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -133,39 +141,89 @@ class KeyTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "key-detail-cell", for: indexPath) as? LockTableViewCell else {
-            fatalError("the dequeued cell) is not an instance of LockTableViewCell")
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "key-detail-cell", for: indexPath)
         let section = (Sections(rawValue: indexPath.section)?.description)!
         let sortedKeys = keys[section]!.keys.sorted()
         let key = sortedKeys[indexPath.row]
-        cell.lockId.text = keys[section]![key]?.description
-        cell.lockStatus.text = keys[section]![key]?.status
+        cell.textLabel?.text = keys[section]![key]?.unit
+        cell.detailTextLabel?.text = "\(keys[section]![key]!.description) - \(keys[section]![key]!.address)"
+        
+        let status = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: cell.textLabel!.frame.height))
+        status.text = keys[section]![key]?.status
+        status.textAlignment = .right
+        cell.accessoryView = status
+        
         return cell
     }
- 
-    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]?
-    {
-        let section = (Sections(rawValue: indexPath.section)?.description)!
-        if section != "tenant" {
-            return []
-        }
-        let shareAction = UITableViewRowAction(style: .default, title: "Share" , handler: {
-            (action:UITableViewRowAction, indexPath: IndexPath) -> Void in
-            let section = (Sections(rawValue: indexPath.section)?.description)!
-            let sortedKeys = self.keys[section]!.keys.sorted()
-            let key = sortedKeys[indexPath.row]
-            self.selectedLock = self.keys[section]![key]?.lock_pk
-            self.performSegue(withIdentifier: "SurrogateSegue", sender: self)
-        })
     
-        return [shareAction]
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let section = (Sections(rawValue: indexPath.section)?.description)!
+        var actions: [UIContextualAction] = []
+        if section == "tenant" {
+            let action = UIContextualAction(style: .normal, title: "Activty") { (action, view, completionHandler) in
+                let sortedKeys = self.keys[section]!.keys.sorted()
+                let key = sortedKeys[indexPath.row]
+                self.selectedUnit = "\(self.keys[section]![key]!.unit) \(self.keys[section]![key]!.description)"
+                self.selectedLog = self.keys[section]![key]?.log
+                self.performSegue(withIdentifier: "LogSegue", sender: self)
+                completionHandler(true)
+            }
+            actions.append(action)
+        }
+        return UISwipeActionsConfiguration(actions:actions)
     }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let section = (Sections(rawValue: indexPath.section)?.description)!
+        var actions: [UIContextualAction] = []
+        if section == "tenant" {
+            let action = UIContextualAction(style: .normal, title: "Share") { (action, view, completionHandler) in
+                let sortedKeys = self.keys[section]!.keys.sorted()
+                let key = sortedKeys[indexPath.row]
+                self.selectedLock = self.keys[section]![key]?.lock_pk
+                self.performSegue(withIdentifier: "SurrogateSegue", sender: self)
+                completionHandler(true)
+            }
+            actions.append(action)
+        }
+        return UISwipeActionsConfiguration(actions:actions)
+    }
+ 
+//    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]?
+//    {
+//        let section = (Sections(rawValue: indexPath.section)?.description)!
+//        if section == "tenant" {
+//            let shareAction = UITableViewRowAction(style: .default, title: "Share" , handler: {
+//                (action:UITableViewRowAction, indexPath: IndexPath) -> Void in
+//                let section = (Sections(rawValue: indexPath.section)?.description)!
+//                let sortedKeys = self.keys[section]!.keys.sorted()
+//                let key = sortedKeys[indexPath.row]
+//                self.selectedLock = self.keys[section]![key]?.lock_pk
+//                self.performSegue(withIdentifier: "SurrogateSegue", sender: self)
+//            })
+//            let shareAction2 = UITableViewRowAction(style: .default, title: "Share" , handler: {
+//                (action:UITableViewRowAction, indexPath: IndexPath) -> Void in
+//                let section = (Sections(rawValue: indexPath.section)?.description)!
+//                let sortedKeys = self.keys[section]!.keys.sorted()
+//                let key = sortedKeys[indexPath.row]
+//                self.selectedLock = self.keys[section]![key]?.lock_pk
+//                self.performSegue(withIdentifier: "SurrogateSegue", sender: self)
+//            })
+//            return [shareAction]
+//        }
+//        else {
+//            return []
+//        }
+//    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let nc = segue.destination as? UINavigationController,
             let cc = nc.topViewController as? SurrogateViewController {
             cc.lock = selectedLock
+        }
+        if let lc = segue.destination as? LogViewController {
+            lc.unit = selectedUnit
+            lc.logitems = selectedLog
         }
     }
     

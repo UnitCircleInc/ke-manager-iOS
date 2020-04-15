@@ -159,8 +159,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var masterView: MasterKeyTableViewController?
     var scanning = false
     var keys: [String: [String: Key]] = [:]
+    var urlTasks: [URLSessionTask] = []
+    var backgroundCompletionHandler: (() -> Void)?
 
     var window: UIWindow?
+    private lazy var session: URLSession = {
+        //let sessionConfig = URLSessionConfiguration.default
+        let sessionConfig = URLSessionConfiguration.background(withIdentifier: "ca.unitcircle.bgUrlSession")
+        sessionConfig.waitsForConnectivity = true
+        sessionConfig.allowsCellularAccess = true
+        sessionConfig.timeoutIntervalForRequest = 60.0  // Individual request timeout
+        sessionConfig.timeoutIntervalForResource = 15.0*60.0 // Overall request timeout including retries
+        return URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue())
+    } ()
+    
+    func application(_ application: UIApplication,
+                     handleEventsForBackgroundURLSession identifier: String,
+                     completionHandler: @escaping () -> Void) {
+            backgroundCompletionHandler = completionHandler
+    }
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -178,7 +196,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let userActivity = userActivityOption as? NSUserActivity,
             let url  = userActivity.webpageURL,
             let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
-            process_invite(components.path.removePrefix("/device/"), sendapn: true)
+            process_invite(components.path.removePrefix("/device/"))
         }
         return true
     }
@@ -310,12 +328,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         if aps["content-available"] as? Int == 1 {
             DispatchQueue.main.async { [weak self] in
-                os_log(.default, log: appLogger, "received silient notification userInfo: %{public}s", userInfo.description)
-                guard let msg = aps["request"] as? String else {
-                    completionHandler(.failed)
-                    return
-                }
-                self?.process_invite(msg, sendapn: false)
+                self?.requestKeys()
                 completionHandler(.newData)
             }
         }
@@ -331,86 +344,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
                 return false
         }
-        process_invite(components.path.removePrefix("/device/"), sendapn: true)
+        process_invite(components.path.removePrefix("/device/"))
         return true
     }
     
-    func process_invite(_ token: String, sendapn: Bool) {
-        os_log(.default, log: appLogger, "received token: %{public}s", token)
-        
-        if let dectoken = Data(base64URLEncoded: token),
-           let push = pushToken {
-            let reqdata: [String: Any] = sendapn ? ["apn-token": push, "token": dectoken] : [:]
-            let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-            let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
-            os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-keys data: %{public}s", Data(enc_req).encodeHex())
-            let url = URL(string: "https://www.qubyte.ca/api/v1/request-keys")!
-            var req = URLRequest(url: url)
-            req.httpMethod = "POST"
-            req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-                   
-            let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
-                if let error = error {
-                   os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
-                   return
-                }
-                guard let response = response as? HTTPURLResponse else {
-                   os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
-                   return
-                }
-                guard let data = data else {
-                   os_log(.error, log: appLogger, "error: missing data")
-                   return
-                }
-                if response.statusCode != 200 {
-                   os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
-                   return
-                }
-                guard let enc = String(data: data, encoding: .utf8) else {
-                   os_log(.error, log: appLogger, "error: data not utf8 encoded")
-                   return
-                }
-                guard let enc2 = enc.decodeZ85() else {
-                   os_log(.error, log: appLogger, "error: data not z85 encoded")
-                   return
-                }
-                guard let enc3 = try? CBOR.decode(enc2) else {
-                   os_log(.error, log: appLogger, "error: unable to decode CBOR")
-                   return
-                }
-                os_log(.default, log: appLogger, "info: data %{public}s", enc3.description)
-
-                if enc3.count != 1 {
-                   os_log(.error, log: appLogger, "error: expecting only 1 CBOR item")
-                   return
-                }
-
-                guard let enc4 = enc3[0] as? [Any] else {
-                   os_log(.error, log: appLogger, "error: COBR item not dictionary")
-                   return
-                }
-                var newkeys: [String: [String: Key]] = ["tenant": [:], "master": [:], "surrogate": [:]]
-                for item in enc4 {
-                    if let key = item as? [String: Any],
-                       let keydata = key["key"] as? Data,
-                       let keylock = key["lock"] as? String,
-                       let keykind = key["kind"] as? String,
-                       let keydesc = key["description"] as? String,
-                       let keyaddress = key["address"] as? String,
-                       let keyunit = key["unit"] as? String {
-                        newkeys[keykind]![keyunit] = Key(key: keydata, lock_pk: keylock, kind: keykind, description: keydesc, address: keyaddress, unit: keyunit, status: "locked")
-                    }
-                }
-
-                // TODO Need to persist keys to database so can get them back n relaunch
-                self.keys = newkeys
-                self.view?.updateKeys(self.keys)
-            }
-            task.resume()
+    func process_invite(_ token: String) {
+        guard let dectoken = Data(base64URLEncoded: token) else {
+            os_log(.default, log: appLogger, "unable to decode token %{public}s", token)
+            return
         }
-        else {
-            os_log(.default, log: appLogger, "unable to process join req - we don't have pushid yet")
+        guard let push = pushToken else {
+            os_log(.default, log: appLogger, "unable to process invote - we don't have pushid yet")
+            return
         }
+        let reqdata: [String: Any] = ["apn-token": push, "token": dectoken]
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-keys data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/request-keys")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
+        let task = session.downloadTask(with: req)
+        task.taskDescription = "keys"
+        urlTasks.append(task)
+        task.resume()
     }
     
     
@@ -423,73 +381,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-               
-        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
-            if let error = error {
-                os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
-                self.view?.updateKeysFailed()
-                return
-            }
-            guard let response = response as? HTTPURLResponse else {
-                os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
-                self.view?.updateKeysFailed()
-                return
-            }
-            guard let data = data else {
-                os_log(.error, log: appLogger, "error: missing data")
-                self.view?.updateKeysFailed()
-                return
-            }
-            if response.statusCode != 200 {
-                os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
-                self.view?.updateKeysFailed()
-                return
-            }
-            guard let enc = String(data: data, encoding: .utf8) else {
-                os_log(.error, log: appLogger, "error: data not utf8 encoded")
-                self.view?.updateKeysFailed()
-                return
-            }
-            guard let enc2 = enc.decodeZ85() else {
-                os_log(.error, log: appLogger, "error: data not z85 encoded")
-                self.view?.updateKeysFailed()
-                return
-            }
-            guard let enc3 = try? CBOR.decode(enc2) else {
-                os_log(.error, log: appLogger, "error: unable to decode CBOR")
-                self.view?.updateKeysFailed()
-                return
-            }
-            os_log(.default, log: appLogger, "info: data %{public}s", enc3.description)
-
-            if enc3.count != 1 {
-                os_log(.error, log: appLogger, "error: expecting only 1 CBOR item")
-                self.view?.updateKeysFailed()
-                return
-            }
-
-            guard let enc4 = enc3[0] as? [Any] else {
-                os_log(.error, log: appLogger, "error: COBR item not dictionary")
-                self.view?.updateKeysFailed()
-                return
-            }
-            var newkeys: [String: [String: Key]] = ["tenant": [:], "master": [:], "surrogate": [:]]
-            for item in enc4 {
-                if let key = item as? [String: Any],
-                   let keydata = key["key"] as? Data,
-                   let keylock = key["lock"] as? String,
-                   let keykind = key["kind"] as? String,
-                   let keydesc = key["description"] as? String,
-                   let keyaddress = key["address"] as? String,
-                   let keyunit = key["unit"] as? String {
-                    newkeys[keykind]![keyunit] = Key(key: keydata, lock_pk: keylock, kind: keykind, description: keydesc, address: keyaddress, unit: keyunit, status: "locked")
-                }
-            }
-
-            // TODO Need to persist keys to database so can get them back n relaunch
-            self.keys = newkeys
-            self.view?.updateKeys(self.keys)
-        }
+        let task = session.downloadTask(with: req)
+        task.taskDescription = "keys"
+        urlTasks.append(task)
         task.resume()
     }
     
@@ -502,22 +396,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-               
-        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
-            if let error = error {
-               os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
-               return
-            }
-            guard let response = response as? HTTPURLResponse else {
-               os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
-               return
-            }
-            
-            if response.statusCode != 200 {
-               os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
-               return
-            }
-        }
+        let task = session.downloadTask(with: req)
+        task.taskDescription = "request-master"
+        urlTasks.append(task)
         task.resume()
     }
     
@@ -530,22 +411,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-
-        
-        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
-            if let error = error {
-               os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
-               return
-            }
-            guard let response = response as? HTTPURLResponse else {
-               os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
-               return
-            }
-            if response.statusCode != 200 {
-               os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
-               return
-            }
-        }
+        let task = session.downloadTask(with: req)
+        task.taskDescription = "request-surrogate"
+        urlTasks.append(task)
         task.resume()
     }
     
@@ -558,22 +426,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-
-        
-        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
-            if let error = error {
-               os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
-               return
-            }
-            guard let response = response as? HTTPURLResponse else {
-               os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
-               return
-            }
-            if response.statusCode != 200 {
-               os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
-               return
-            }
-        }
+        let task = session.downloadTask(with: req)
+        task.taskDescription = "assign-lock-to-unit"
+        urlTasks.append(task)
         task.resume()
     }
     
@@ -586,74 +441,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-
-        
-        let task = URLSession.shared.dataTask(with: req) { (data: Data?, response: URLResponse?, error: Error?) in
-            if let error = error {
-                self.masterView?.updateUnitsFailed()
-                os_log(.error, log: appLogger, "error: %{public}s", error.localizedDescription)
-                return
-            }
-            guard let response = response as? HTTPURLResponse else {
-                self.masterView?.updateUnitsFailed()
-                os_log(.error, log: appLogger, "error: invalid HTTPURLResponse")
-                return
-            }
-            guard let data = data else {
-               os_log(.error, log: appLogger, "error: missing data")
-               return
-            }
-            if response.statusCode != 200 {
-                self.masterView?.updateUnitsFailed()
-                os_log(.error, log: appLogger, "statusCode: %d", response.statusCode)
-                return
-            }
-            os_log(.default, log: appLogger, "rsp %{public}s", data.encodeHex())
-            
-            guard let enc = String(data: data, encoding: .utf8) else {
-                os_log(.error, log: appLogger, "error: data not utf8 encoded")
-                return
-            }
-            guard let enc2 = enc.decodeZ85() else {
-                os_log(.error, log: appLogger, "error: data not z85 encoded")
-                return
-            }
-            guard let enc3 = try? CBOR.decode(enc2) else {
-                os_log(.error, log: appLogger, "error: unable to decode CBOR")
-                return
-            }
-            os_log(.default, log: appLogger, "info: data %{public}s", enc3.description)
-
-            if enc3.count != 1 {
-                os_log(.error, log: appLogger, "error: expecting only 1 CBOR item")
-                return
-            }
-
-            guard let enc4 = enc3[0] as? [Any] else {
-                os_log(.error, log: appLogger, "error: COBR item not dictionary")
-                return
-            }
-            var newUnits: [String: [String: UnitDesc]] = [:]
-                 for item in enc4 {
-                     if let unitdesc = item as? [String: Any],
-                        let unit = unitdesc["unit"] as? String,
-                        let id = unitdesc["id"] as? String,
-                        let description = unitdesc["description"] as? String {
-                        if newUnits[description] == nil {
-                            newUnits[description] = [:]
-                            
-                        }
-                        if let lock = unitdesc["lock"] as? String {
-                            newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: lock)
-                        }
-                        else {
-                            newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: nil)
-                        }
-                 }
-             }
-            
-            self.masterView?.updateUnits(newUnits)
-        }
+        let task = session.downloadTask(with: req)
+        task.taskDescription = "units"
+        urlTasks.append(task)
         task.resume()
     }
 }
@@ -670,6 +460,130 @@ extension AppDelegate: UcBleCentralDelegate {
     }
     func didBecomeInactive() {
         stopScanning()
+    }
+}
+
+extension AppDelegate: URLSessionDelegate {
+    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        DispatchQueue.main.async {
+            if let completionHandler = self.backgroundCompletionHandler {
+                self.backgroundCompletionHandler = nil
+                completionHandler()
+            }
+        }
+    }
+}
+
+extension AppDelegate: URLSessionTaskDelegate {
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if  let error = error {
+            // TODO What else should we do?
+            print("\(error.localizedDescription)")
+        }
+    }
+}
+
+extension AppDelegate: URLSessionDownloadDelegate {
+    func handleUnits(data: Data) {
+        if let z85enc = String(data: data, encoding: .utf8),
+           let cborenc =  z85enc.decodeZ85(),
+           let items = try? CBOR.decode(cborenc),
+           items.count == 1,
+           let units = items[0] as? [Any] {
+            var newUnits: [String: [String: UnitDesc]] = [:]
+            for item in units {
+                if let unitdesc = item as? [String: Any],
+                   let unit = unitdesc["unit"] as? String,
+                   let id = unitdesc["id"] as? String,
+                   let description = unitdesc["description"] as? String,
+                   let battery = unitdesc["battery"] as? Double {
+                    if newUnits[description] == nil {
+                        newUnits[description] = [:]
+                    }
+                    if let lock = unitdesc["lock"] as? String {
+                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: lock, battery: battery)
+                    }
+                    else {
+                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: nil, battery: battery)
+                    }
+                }
+            }
+            self.masterView?.updateUnits(newUnits)
+        }
+        else {
+            os_log(.default, log: appLogger, "unable to process units response {public}%s", Data(data).encodeHex())
+        }
+    }
+    
+    func handleKeys(data: Data) {
+        if let z85enc = String(data: data, encoding: .utf8),
+           let cborenc =  z85enc.decodeZ85(),
+           let items = try? CBOR.decode(cborenc),
+           items.count == 1,
+           let keys = items[0] as? [Any] {
+            var newkeys: [String: [String: Key]] = ["tenant": [:], "master": [:], "surrogate": [:]]
+            for item in keys {
+                if let key = item as? [String: Any],
+                   let keydata = key["key"] as? Data,
+                   let keylock = key["lock"] as? String,
+                   let keykind = key["kind"] as? String,
+                   let keydesc = key["description"] as? String,
+                   let keyaddress = key["address"] as? String,
+                   let keyunit = key["unit"] as? String,
+                   let keylog = key["log"] as? [[String:Any]] {
+                    var logitems: [KeyLogItem] = []
+                    for logitem in keylog {
+                        if let event = logitem["event"] as? String,
+                           let date = logitem["date"] as? Double {
+                            let log = KeyLogItem(date: Date(timeIntervalSince1970: date), event: event)
+                            logitems.append(log)
+                        }
+                    }
+                    newkeys[keykind]![keyunit] = Key(key: keydata, lock_pk: keylock, kind: keykind, description: keydesc, address: keyaddress, unit: keyunit, status: "locked", log: logitems)
+                }
+            }
+
+            // TODO Need to persist keys to database so can get them back n relaunch
+            self.keys = newkeys
+            self.view?.updateKeys(self.keys)
+        }
+        else {
+            os_log(.default, log: appLogger, "unable to process keys response {public}%s", Data(data).encodeHex())
+        }
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        do {
+            // TODO It might be better to open URL for read and then push all of this to a worker thread
+            // This way temp URL can still be accessed and the thread used for OS doesn't get stalled
+            let data = try Data(contentsOf: location)
+            if let desc = downloadTask.taskDescription {
+                if desc == "keys" {
+                    handleKeys(data:data)
+                }
+                else if desc == "units" {
+                    handleUnits(data: data)
+                }
+                else if desc == "assign-lock-to-unit" {
+                    // Nothing to do
+                }
+                else if desc == "request-master" {
+                    // Nothing to do
+                }
+                else if desc == "request-surrogate" {
+                    // Nothing to do
+                }
+                else {
+                    os_log(.default, log: appLogger, "unknown data task type {public}%s", desc)
+                }
+            }
+            else {
+                os_log(.default, log: appLogger, "task missing taskDescription {public}%s", downloadTask.description)
+            }
+        }
+        catch {
+            os_log(.default, log: appLogger, "unable to process keys response {public}%s", downloadTask.description)
+        }
     }
 }
 
