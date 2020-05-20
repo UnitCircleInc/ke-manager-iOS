@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		79398173242941C900000BFE /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79398172242941C900000BFE /* ScanViewController.swift */; };
 		79445D5324466D08000A0F71 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79445D5224466D08000A0F71 /* LogViewController.swift */; };
+		795C63D324742E44000053A0 /* Sodium.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 795C63D224742E44000053A0 /* Sodium.framework */; };
+		795C63D424742E44000053A0 /* Sodium.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 795C63D224742E44000053A0 /* Sodium.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		79A8A6CD22E659CA00F09A79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */; };
 		79A8A6CF22E659CA00F09A79 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6CE22E659CA00F09A79 /* ViewController.swift */; };
 		79A8A6D222E659CA00F09A79 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79A8A6D022E659CA00F09A79 /* Main.storyboard */; };
@@ -30,8 +32,6 @@
 		79E1CD4722F2219D00BEE62D /* COBS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4322F2219D00BEE62D /* COBS.swift */; };
 		79E1CD4822F2219D00BEE62D /* CRC32C.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4422F2219D00BEE62D /* CRC32C.swift */; };
 		79E1CD4A22F2259500BEE62D /* UcLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4922F2259500BEE62D /* UcLogger.swift */; };
-		79E1CDE522F4BDBD00BEE62D /* Sodium.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79E1CDE322F4BBF100BEE62D /* Sodium.framework */; };
-		79E1CDE622F4BDBD00BEE62D /* Sodium.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 79E1CDE322F4BBF100BEE62D /* Sodium.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,13 +52,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		79E1CDE722F4BDBD00BEE62D /* Embed Frameworks */ = {
+		795C63D524742E44000053A0 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				79E1CDE622F4BDBD00BEE62D /* Sodium.framework in Embed Frameworks */,
+				795C63D424742E44000053A0 /* Sodium.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,6 +68,7 @@
 /* Begin PBXFileReference section */
 		79398172242941C900000BFE /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
 		79445D5224466D08000A0F71 /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
+		795C63D224742E44000053A0 /* Sodium.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sodium.framework; sourceTree = "<group>"; };
 		79A8A6C922E659CA00F09A79 /* Konnex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Konnex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		79A8A6CE22E659CA00F09A79 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -96,7 +97,6 @@
 		79E1CD4322F2219D00BEE62D /* COBS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = COBS.swift; sourceTree = "<group>"; };
 		79E1CD4422F2219D00BEE62D /* CRC32C.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRC32C.swift; sourceTree = "<group>"; };
 		79E1CD4922F2259500BEE62D /* UcLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UcLogger.swift; sourceTree = "<group>"; };
-		79E1CDE322F4BBF100BEE62D /* Sodium.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sodium.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,7 +104,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				79E1CDE522F4BDBD00BEE62D /* Sodium.framework in Frameworks */,
+				795C63D324742E44000053A0 /* Sodium.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,7 +197,7 @@
 		79E1CD4E22F2614400BEE62D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				79E1CDE322F4BBF100BEE62D /* Sodium.framework */,
+				795C63D224742E44000053A0 /* Sodium.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -212,13 +212,15 @@
 				79A8A6C522E659CA00F09A79 /* Sources */,
 				79A8A6C622E659CA00F09A79 /* Frameworks */,
 				79A8A6C722E659CA00F09A79 /* Resources */,
-				79E1CDE722F4BDBD00BEE62D /* Embed Frameworks */,
+				795C63D524742E44000053A0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Konnex;
+			packageProductDependencies = (
+			);
 			productName = Konnex;
 			productReference = 79A8A6C922E659CA00F09A79 /* Konnex.app */;
 			productType = "com.apple.product-type.application";
@@ -291,6 +293,8 @@
 				Base,
 			);
 			mainGroup = 79A8A6C022E659CA00F09A79;
+			packageReferences = (
+			);
 			productRefGroup = 79A8A6CA22E659CA00F09A79 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -528,6 +532,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 6CQYR849L3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -554,6 +559,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 6CQYR849L3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

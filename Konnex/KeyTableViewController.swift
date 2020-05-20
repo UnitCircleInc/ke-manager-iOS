@@ -94,8 +94,14 @@ class KeyTableViewController: UITableViewController {
         do {
             let data = try Data(contentsOf: KeyTableViewController.fileUrl)
             if let dec = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? Data {
-                keys = try PropertyListDecoder().decode([String:[String:Key]].self, from: dec)
-                os_log(.default, log: mkLogger, "mk: loadKeys succeeded")
+                let newKeys = try PropertyListDecoder().decode([String:[String:Key]].self, from: dec)
+                if newKeys.count > 0 {
+                    keys = newKeys
+                    os_log(.default, log: mkLogger, "mk: loadKeys succeeded")
+                }
+                else {
+                    os_log(.default, log: mkLogger, "mk: loadKeys archive empty")
+                }
             }
             else {
                 os_log(.default, log: mkLogger, "mk: loadKeys unable to unarchive")
@@ -121,6 +127,34 @@ class KeyTableViewController: UITableViewController {
         DispatchQueue.main.async {
             [weak self] in
             self?.refreshControl?.endRefreshing()
+            self?.keyTable.reloadData()
+        }
+    }
+    
+    func updateKeyStatus(_ key: Key, status: String) {
+        if let tenantKeys = keys["tenant"] {
+            for t_key in tenantKeys {
+                if t_key.value.key == key.key {
+                    keys["tenant"]?[t_key.key]  = Key(key: key.key, lock_pk: key.lock_pk, kind: key.kind, description: key.description, address: key.address, unit: key.unit, status: status, log: key.log)
+                }
+            }
+        }
+        if let tenantKeys = keys["master"] {
+            for t_key in tenantKeys {
+                if t_key.value.key == key.key {
+                    keys["master"]?[t_key.key]  = Key(key: key.key, lock_pk: key.lock_pk, kind: key.kind, description: key.description, address: key.address, unit: key.unit, status: status, log: key.log)
+                 }
+            }
+        }
+        if let tenantKeys = keys["surrogate"] {
+            for t_key in tenantKeys {
+                if t_key.value.key == key.key {
+                    keys["surrogate"]?[t_key.key]  = Key(key: key.key, lock_pk: key.lock_pk, kind: key.kind, description: key.description, address: key.address, unit: key.unit, status: status, log: key.log)
+                }
+            }
+        }
+        DispatchQueue.main.async {
+            [weak self] in
             self?.keyTable.reloadData()
         }
     }

@@ -165,7 +165,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     private lazy var session: URLSession = {
         //let sessionConfig = URLSessionConfiguration.default
-        let sessionConfig = URLSessionConfiguration.background(withIdentifier: "ca.unitcircle.bgUrlSession")
+        let sessionConfig = URLSessionConfiguration.background(withIdentifier: "ca.unitcircle.Konnex.bgUrlSession")
         sessionConfig.waitsForConnectivity = true
         sessionConfig.allowsCellularAccess = true
         sessionConfig.timeoutIntervalForRequest = 60.0  // Individual request timeout
@@ -450,10 +450,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: UcBleCentralDelegate {
     func didDiscover(_ peripheral: UcBlePeripheral) {
-        UcBleCentral.sharedInstance.stopScan()
-        state = .waitForConnect
-        peripheral.delegate = self
-        peripheral.connect(nil)
+        if let lora_mac = peripheral.lora_mac(),
+           let _ = findKeyForLock(lora_mac.encodeHex()) {
+            UcBleCentral.sharedInstance.stopScan()
+            state = .waitForConnect
+            peripheral.delegate = self
+            peripheral.connect(nil)
+        }
+        else {
+            if let lora_mac = peripheral.lora_mac() {
+                os_log(.default, log: appLogger, "Igonoring lock because we have no key %{public}s", lora_mac.encodeHex())
+            }
+            else {
+                os_log(.default, log: appLogger, "Internal error: lock with out loramac")
+            }
+        }
     }
     func didBecomeActive() {
         startScanning()
@@ -604,6 +615,31 @@ func unpackUInt64(_ v: Data) -> UInt64 {
 }
 
 extension AppDelegate: UcBlePeripheralDelegate {
+    func findKeyForLock(_ lock: String) -> Key? {
+        if let tenantKeys = keys["tenant"] {
+            for key in tenantKeys {
+                if key.value.lock_pk == lock {
+                    return key.value
+                }
+            }
+        }
+        if let tenantKeys = keys["master"] {
+            for key in tenantKeys {
+                if key.value.lock_pk == lock {
+                    return key.value
+                }
+            }
+        }
+        if let tenantKeys = keys["surrogate"] {
+            for key in tenantKeys {
+                if key.value.lock_pk == lock {
+                    return key.value
+                }
+            }
+        }
+        return nil
+    }
+    
     func didReceive(_ peripheral: UcBlePeripheral, data: Data) {
         os_log(.default, log: appLogger, "rx: %{public}s", data.encodeHex())
         switch state {
@@ -632,15 +668,14 @@ extension AppDelegate: UcBlePeripheralDelegate {
                     peripheral.disconnect(UcBleError.protocolError)
                     return
                 }
-                
-                guard let unlockKey = keys[lora_mac.encodeHex()]?["key"] as? Data else {
+                guard let unlockKey = findKeyForLock(lora_mac.encodeHex()) else {
                     os_log(.error, log: appLogger, "We have no key")
                     state = .waitForConnect
                     peripheral.disconnect(UcBleError.protocolError)
                     return
                 }
-                os_log(.default, log: appLogger, "key %{public}s", unlockKey.encodeHex())
-                peripheral.send(Data(sodium.box.seal(message: Bytes(unlockKey), beforenm: beforeNmKey, nonce: Bytes(phone_nonce+packUInt64(counter)))!))
+                os_log(.default, log: appLogger, "key %{public}s", unlockKey.key.encodeHex())
+                peripheral.send(Data(sodium.box.seal(message: Bytes(unlockKey.key), beforenm: beforeNmKey, nonce: Bytes(phone_nonce+packUInt64(counter)))!))
                 state = .waitForSigningNonce
             }
             else {
@@ -671,7 +706,8 @@ extension AppDelegate: UcBlePeripheralDelegate {
             if let result = sodium.box.open(authenticatedCipherText: Bytes(data), beforenm: beforeNmKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
                 if result.count == 1 && result[0] == UInt8(ascii: "O") {
                     os_log(.default, log: appLogger, "We oppend it!")
-                    guard let lora_mac = peripheral.lora_mac() else {
+                    guard let lora_mac = peripheral.lora_mac(),
+                          let unlockKey = findKeyForLock(lora_mac.encodeHex()) else {
                         os_log(.error, log: appLogger, "Peripheral has no mac")
                         state = .waitForConnect
                         peripheral.disconnect(UcBleError.protocolError)
@@ -679,7 +715,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
                     }
                     
                     // TODO Fix me keys[lora_mac.encodeHex()]?["status"] = "unlocked"
-                    view?.updateKeys(keys)
+                    view?.updateKeyStatus(unlockKey, status: "unlocked")
                 }
             }
             //peripheral.disconnect(UcBleError.protocolError)
@@ -703,7 +739,8 @@ extension AppDelegate: UcBlePeripheralDelegate {
         UcBleCentral.sharedInstance.scan()
     }
     func didDisconnect(_ peripheral: UcBlePeripheral, error: Error?) {
-        guard let lora_mac = peripheral.lora_mac() else {
+        guard let lora_mac = peripheral.lora_mac(),
+              let unlockKey = findKeyForLock(lora_mac.encodeHex()) else {
             os_log(.error, log: appLogger, "Peripheral has no mac")
             state = .waitForConnect
             keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))
@@ -712,7 +749,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
         }
         
         // TODO Fix me keys[lora_mac.encodeHex()]?["status"] = "locked"
-        view?.updateKeys(keys)
+        view?.updateKeyStatus(unlockKey, status: "locked")
         os_log(.default, log: appLogger, "didDisconnect(%{public}s)", peripheral.identifier.description)
         if state != .done {
             
