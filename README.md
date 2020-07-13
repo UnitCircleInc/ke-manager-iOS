@@ -1,10 +1,6 @@
 # Building
 
-You will need to build swift-sodium first (konnex branch).  Open `File/Project Settings.../Advanced..`. and click on the `Products: ...... right arrow` to open location of build produts in a Finder window.  Copy `Debug-iphoneos/Sodium.framework` and `Debug-iphoneos/Sodium.framework.dYM` to this directory.  Then add  `Sodium.framework` to the project as an `Embedded Binary`.
-
-To use it you will need to `import Sodium`
-
-Note: There is some "suggestion" that if you add the `Sodium.framework.dSYM` directory to the Frameworks folder in Xcode that it will then find the symbols when debugging (if the issue is in Sodium framework).  See https://stackoverflow.com/questions/8584651/xcode-adding-dsym-file-for-a-framework-with-debug-information-in-it.
+This project uses the Cocoa Pod from the [swift-sodium](https://github.com/jedisct1/swift-sodium) project.
 
 # iOS 13 SF Symbols back ported to iOS 12
 
@@ -33,10 +29,21 @@ $ cairosvg battery25.svg --output-width 135 --output-height 75 -o battery25@3.pn
 
 ```
 
-Notes:
+> Notes:
+>
+> - The 25/50/75 pixel sizes are for TabBar icons.
+> - The larger width for the battery icon is to refelct it's non-square shape.
+>
+> Then drag and drop the png files to the Assests folder in Xcode.
 
-- The 25/50/75 pixel sizes are for TabBar icons.
-- The larger width for the battery icon is to refelct it's non-square shape.
+## Export Controls
 
-Then drag and drop the png files to the Assests folder in Xcode.
+See:
+
+* [Apache Cyrpto](https://www.apache.org/dev/crypto.html) has some good info and Konnex iOS App would seem to fall under the same process.  Seems like as long as source code for crypto is public (e.g. GITHUB) all that is required is an email to notify BIS.
+* [EAR 742.15b](https://www.ecfr.gov/cgi-bin/text-idx?SID=03a422b19b284c19380a2a0800174721&mc=true&node=pt15.2.742&rgn=div5#se15.2.742_115)
+* [BIS Encryptions items not subject to EAR](https://bis.doc.gov/index.php/policy-guidance/encryption/1-encryption-items-not-subject-to-the-ear) - The side bar has lots of good links.
+* [Apple export compliance](https://help.apple.com/app-store-connect/#/devc3f64248f)
+* [BIS Quick Reference](https://bis.doc.gov/index.php/documents/new-encryption/1652-cat-5-part-2-quick-reference-guide/file)
+
 

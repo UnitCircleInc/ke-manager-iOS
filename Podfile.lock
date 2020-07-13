@@ -1,0 +1,16 @@
+PODS:
+  - Sodium (0.8.0)
+
+DEPENDENCIES:
+  - Sodium (~> 0.8)
+
+SPEC REPOS:
+  trunk:
+    - Sodium
+
+SPEC CHECKSUMS:
+  Sodium: 63c0ca312a932e6da481689537d4b35568841bdc
+
+PODFILE CHECKSUM: 5c75d4dc76ecdda8acbf2f7ed15f6a5caff1e077
+
+COCOAPODS: 1.9.1
