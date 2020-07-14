@@ -650,7 +650,7 @@
 				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
-				DEVELOPMENT_TEAM = 6CQYR849L3;
+				DEVELOPMENT_TEAM = Q9H42435FT;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -662,7 +662,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = ca.unitcircle.Konnex;
+				PRODUCT_BUNDLE_IDENTIFIER = com.konnexenterprises.Konnex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_INCLUDE_PATHS = "";
 				SWIFT_VERSION = 5.0;
@@ -678,7 +678,7 @@
 				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
-				DEVELOPMENT_TEAM = 6CQYR849L3;
+				DEVELOPMENT_TEAM = Q9H42435FT;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -690,7 +690,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = ca.unitcircle.Konnex;
+				PRODUCT_BUNDLE_IDENTIFIER = com.konnexenterprises.Konnex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_INCLUDE_PATHS = "";
 				SWIFT_VERSION = 5.0;
