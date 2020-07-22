@@ -273,7 +273,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         os_log(.default, log: appLogger, "Device Token: %{public}s", deviceToken.encodeHex())
         pushToken = deviceToken
         
-        let tag = "ca.qubyte.keys".data(using: .utf8)!
+        let tag = "com.konnexexterprises.keys".data(using: .utf8)!
         let query : [String: Any] = [
             kSecClass as String : kSecClassKey,
             kSecAttrApplicationTag as String: tag,
