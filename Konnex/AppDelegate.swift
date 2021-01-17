@@ -450,14 +450,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: UcBleCentralDelegate {
     func didDiscover(_ peripheral: UcBlePeripheral) {
+        UcBleCentral.sharedInstance.stopScan()
         if let lora_mac = peripheral.lora_mac(),
            let _ = findKeyForLock(lora_mac.encodeHex()) {
-            UcBleCentral.sharedInstance.stopScan()
             state = .waitForConnect
             peripheral.delegate = self
             peripheral.connect(nil)
         }
         else {
+            // Restart scan
+            UcBleCentral.sharedInstance.scan()
             if let lora_mac = peripheral.lora_mac() {
                 os_log(.default, log: appLogger, "Igonoring lock because we have no key %{public}s", lora_mac.encodeHex())
             }

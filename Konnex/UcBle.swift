@@ -41,6 +41,19 @@ enum UcBleError: Error {
     case protocolError
 }
 
+func lora_mac_from_ad(_ ad: Any?) -> Data? {
+    guard let md = ad as? Data
+    else {
+        return nil
+    }
+    if (md.count == 10) && (md[0] == 0x30) && (md[1] == 0x00) {
+        return md[2...]
+    }
+    else {
+        return nil
+    }
+}
+
 class UcBlePeripheral: NSObject, CBPeripheralDelegate {
     private var peripheral: CBPeripheral
     private var manager: UcBleCentral
@@ -255,7 +268,7 @@ class UcBlePeripheral: NSObject, CBPeripheralDelegate {
     }
     
     func lora_mac() -> Data? {
-        return advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data
+        return lora_mac_from_ad(advertisementData[CBAdvertisementDataManufacturerDataKey])
     }
 }
 
@@ -334,14 +347,11 @@ class UcBleCentral: NSObject, CBCentralManagerDelegate {
                         advertisementData: [String : Any],
                         rssi RSSI: NSNumber) {
         //os_log(.info, log: log, "centralMnagaer.didDiscover(%{public}s rssi: %f)", peripheral.identifier.description, RSSI.floatValue)
-        if let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String,
-            let lora_mac = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data {
-            if name == "UnitCircle" {
-                os_log(.info, log: log, "centralMnagaer.didDiscover(%{public}s rssi: %f mac: %{public}s)", peripheral.identifier.description, RSSI.floatValue, lora_mac.encodeHex())
-                let peripheral = UcBlePeripheral(peripheral, manager: self, advertisementData: advertisementData, rssi: RSSI)
-                knownPeripherals[peripheral.identifier] = peripheral
-                delegate?.didDiscover(peripheral)
-            }
+        if let lora_mac =  lora_mac_from_ad(advertisementData[CBAdvertisementDataManufacturerDataKey]) {
+            os_log(.info, log: log, "centralMnagaer.didDiscover(%{public}s rssi: %f mac: %{public}s)", peripheral.identifier.description, RSSI.floatValue, lora_mac.encodeHex())
+            let peripheral = UcBlePeripheral(peripheral, manager: self, advertisementData: advertisementData, rssi: RSSI)
+            knownPeripherals[peripheral.identifier] = peripheral
+            delegate?.didDiscover(peripheral)
         }
     }
     
@@ -403,7 +413,7 @@ class UcBleCentral: NSObject, CBCentralManagerDelegate {
     
     func scan() {
         os_log(.info, log: log, "scanning")
-        manager?.scanForPeripherals(withServices: nil, options: nil)
+        manager?.scanForPeripherals(withServices: [service_uuid], options: nil)
     }
     
     func stopScan() {

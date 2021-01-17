@@ -78,8 +78,8 @@
             filePath = "Konnex/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "619"
-            endingLineNumber = "619"
+            startingLineNumber = "621"
+            endingLineNumber = "621"
             landmarkName = "findKeyForLock(_:)"
             landmarkType = "7">
          </BreakpointContent>
