@@ -3,12 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1F0D47C900944345BDE957A4 /* Pods_Konnex_KonnexUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A242BCFC14FFB8152AD3A0F4 /* Pods_Konnex_KonnexUITests.framework */; };
-		303AC5E64E91CCAF910EC12E /* Pods_KonnexTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCC8F63E836E89180B5D341 /* Pods_KonnexTests.framework */; };
+		79126E5726C31F1900734556 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = 79126E5626C31F1900734556 /* Clibsodium */; };
+		79126E5926C31F1900734556 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = 79126E5826C31F1900734556 /* Sodium */; };
 		79398173242941C900000BFE /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79398172242941C900000BFE /* ScanViewController.swift */; };
 		79445D5324466D08000A0F71 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79445D5224466D08000A0F71 /* LogViewController.swift */; };
 		79A8A6CD22E659CA00F09A79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */; };
@@ -32,7 +32,6 @@
 		79E1CD4722F2219D00BEE62D /* COBS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4322F2219D00BEE62D /* COBS.swift */; };
 		79E1CD4822F2219D00BEE62D /* CRC32C.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4422F2219D00BEE62D /* CRC32C.swift */; };
 		79E1CD4A22F2259500BEE62D /* UcLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4922F2259500BEE62D /* UcLogger.swift */; };
-		980D4ACB22D91D1BBC693D6E /* Pods_Konnex.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4591EB3BA93EB1E23C4B194E /* Pods_Konnex.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,10 +52,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3C959F44F74AD274ED1AF7BE /* Pods-Konnex.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Konnex.release.xcconfig"; path = "Target Support Files/Pods-Konnex/Pods-Konnex.release.xcconfig"; sourceTree = "<group>"; };
-		42E5CC02F882A05074D05D6E /* Pods-Konnex-KonnexUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Konnex-KonnexUITests.release.xcconfig"; path = "Target Support Files/Pods-Konnex-KonnexUITests/Pods-Konnex-KonnexUITests.release.xcconfig"; sourceTree = "<group>"; };
-		4591EB3BA93EB1E23C4B194E /* Pods_Konnex.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Konnex.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		760D13DF2465AA5410108B79 /* Pods-Konnex.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Konnex.debug.xcconfig"; path = "Target Support Files/Pods-Konnex/Pods-Konnex.debug.xcconfig"; sourceTree = "<group>"; };
 		79398172242941C900000BFE /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
 		79445D5224466D08000A0F71 /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		79A8A6C922E659CA00F09A79 /* Konnex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Konnex.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,11 +82,6 @@
 		79E1CD4322F2219D00BEE62D /* COBS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = COBS.swift; sourceTree = "<group>"; };
 		79E1CD4422F2219D00BEE62D /* CRC32C.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRC32C.swift; sourceTree = "<group>"; };
 		79E1CD4922F2259500BEE62D /* UcLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UcLogger.swift; sourceTree = "<group>"; };
-		8B2BF27B84A2D8C634F62D58 /* Pods-KonnexTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KonnexTests.release.xcconfig"; path = "Target Support Files/Pods-KonnexTests/Pods-KonnexTests.release.xcconfig"; sourceTree = "<group>"; };
-		A242BCFC14FFB8152AD3A0F4 /* Pods_Konnex_KonnexUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Konnex_KonnexUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BDF139E650DCED5658925FF1 /* Pods-Konnex-KonnexUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Konnex-KonnexUITests.debug.xcconfig"; path = "Target Support Files/Pods-Konnex-KonnexUITests/Pods-Konnex-KonnexUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		C748EB01C359DB754901DA44 /* Pods-KonnexTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KonnexTests.debug.xcconfig"; path = "Target Support Files/Pods-KonnexTests/Pods-KonnexTests.debug.xcconfig"; sourceTree = "<group>"; };
-		FFCC8F63E836E89180B5D341 /* Pods_KonnexTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KonnexTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,7 +89,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				980D4ACB22D91D1BBC693D6E /* Pods_Konnex.framework in Frameworks */,
+				79126E5726C31F1900734556 /* Clibsodium in Frameworks */,
+				79126E5926C31F1900734556 /* Sodium in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,7 +98,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				303AC5E64E91CCAF910EC12E /* Pods_KonnexTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,7 +105,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F0D47C900944345BDE957A4 /* Pods_Konnex_KonnexUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,8 +118,6 @@
 				79A8A6E022E659CC00F09A79 /* KonnexTests */,
 				79A8A6EB22E659CC00F09A79 /* KonnexUITests */,
 				79A8A6CA22E659CA00F09A79 /* Products */,
-				79E1CD4E22F2614400BEE62D /* Frameworks */,
-				E89ABA5BA277B2ABF63D8B00 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -192,29 +179,6 @@
 			path = KonnexUITests;
 			sourceTree = "<group>";
 		};
-		79E1CD4E22F2614400BEE62D /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				4591EB3BA93EB1E23C4B194E /* Pods_Konnex.framework */,
-				A242BCFC14FFB8152AD3A0F4 /* Pods_Konnex_KonnexUITests.framework */,
-				FFCC8F63E836E89180B5D341 /* Pods_KonnexTests.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		E89ABA5BA277B2ABF63D8B00 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				760D13DF2465AA5410108B79 /* Pods-Konnex.debug.xcconfig */,
-				3C959F44F74AD274ED1AF7BE /* Pods-Konnex.release.xcconfig */,
-				BDF139E650DCED5658925FF1 /* Pods-Konnex-KonnexUITests.debug.xcconfig */,
-				42E5CC02F882A05074D05D6E /* Pods-Konnex-KonnexUITests.release.xcconfig */,
-				C748EB01C359DB754901DA44 /* Pods-KonnexTests.debug.xcconfig */,
-				8B2BF27B84A2D8C634F62D58 /* Pods-KonnexTests.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -222,17 +186,19 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79A8A6F122E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex" */;
 			buildPhases = (
-				8C9AA94278B18CC54BFFF111 /* [CP] Check Pods Manifest.lock */,
 				79A8A6C522E659CA00F09A79 /* Sources */,
 				79A8A6C622E659CA00F09A79 /* Frameworks */,
 				79A8A6C722E659CA00F09A79 /* Resources */,
-				5FD60C1E186592D089F63DEC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Konnex;
+			packageProductDependencies = (
+				79126E5626C31F1900734556 /* Clibsodium */,
+				79126E5826C31F1900734556 /* Sodium */,
+			);
 			productName = Konnex;
 			productReference = 79A8A6C922E659CA00F09A79 /* Konnex.app */;
 			productType = "com.apple.product-type.application";
@@ -241,7 +207,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79A8A6F422E659CC00F09A79 /* Build configuration list for PBXNativeTarget "KonnexTests" */;
 			buildPhases = (
-				87A8C35333EA8A6A39D1ECDD /* [CP] Check Pods Manifest.lock */,
 				79A8A6D922E659CC00F09A79 /* Sources */,
 				79A8A6DA22E659CC00F09A79 /* Frameworks */,
 				79A8A6DB22E659CC00F09A79 /* Resources */,
@@ -260,11 +225,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79A8A6F722E659CC00F09A79 /* Build configuration list for PBXNativeTarget "KonnexUITests" */;
 			buildPhases = (
-				C83140FE2D7720238401526C /* [CP] Check Pods Manifest.lock */,
 				79A8A6E422E659CC00F09A79 /* Sources */,
 				79A8A6E522E659CC00F09A79 /* Frameworks */,
 				79A8A6E622E659CC00F09A79 /* Resources */,
-				21DAE3E9679D81A3B7316839 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -283,7 +246,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1030;
-				LastUpgradeCheck = 1030;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = "Unit Circle Inc.";
 				TargetAttributes = {
 					79A8A6C822E659CA00F09A79 = {
@@ -308,6 +271,9 @@
 				Base,
 			);
 			mainGroup = 79A8A6C022E659CA00F09A79;
+			packageReferences = (
+				79126E5526C31F1900734556 /* XCRemoteSwiftPackageReference "swift-sodium" */,
+			);
 			productRefGroup = 79A8A6CA22E659CA00F09A79 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -345,109 +311,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		21DAE3E9679D81A3B7316839 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Konnex-KonnexUITests/Pods-Konnex-KonnexUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Konnex-KonnexUITests/Pods-Konnex-KonnexUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Konnex-KonnexUITests/Pods-Konnex-KonnexUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5FD60C1E186592D089F63DEC /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Konnex/Pods-Konnex-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Konnex/Pods-Konnex-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Konnex/Pods-Konnex-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		87A8C35333EA8A6A39D1ECDD /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KonnexTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8C9AA94278B18CC54BFFF111 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Konnex-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C83140FE2D7720238401526C /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Konnex-KonnexUITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		79A8A6C522E659CA00F09A79 /* Sources */ = {
@@ -552,6 +415,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -613,6 +477,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -644,7 +509,6 @@
 		};
 		79A8A6F222E659CC00F09A79 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 760D13DF2465AA5410108B79 /* Pods-Konnex.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
@@ -672,7 +536,6 @@
 		};
 		79A8A6F322E659CC00F09A79 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3C959F44F74AD274ED1AF7BE /* Pods-Konnex.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Konnex/Konnex.entitlements;
@@ -700,7 +563,6 @@
 		};
 		79A8A6F522E659CC00F09A79 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C748EB01C359DB754901DA44 /* Pods-KonnexTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -722,7 +584,6 @@
 		};
 		79A8A6F622E659CC00F09A79 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8B2BF27B84A2D8C634F62D58 /* Pods-KonnexTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -744,7 +605,6 @@
 		};
 		79A8A6F822E659CC00F09A79 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BDF139E650DCED5658925FF1 /* Pods-Konnex-KonnexUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
@@ -765,7 +625,6 @@
 		};
 		79A8A6F922E659CC00F09A79 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 42E5CC02F882A05074D05D6E /* Pods-Konnex-KonnexUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
@@ -824,6 +683,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		79126E5526C31F1900734556 /* XCRemoteSwiftPackageReference "swift-sodium" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jedisct1/swift-sodium.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		79126E5626C31F1900734556 /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 79126E5526C31F1900734556 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		79126E5826C31F1900734556 /* Sodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 79126E5526C31F1900734556 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Sodium;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 79A8A6C122E659CA00F09A79 /* Project object */;
 }

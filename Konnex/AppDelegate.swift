@@ -150,7 +150,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))  // Fake/invalid keypair
     var phone_nonce = Data()
     var lock_nonce = Data()
-    var beforeNmKey = Bytes([])
+    var lock_em_pk = Data()
     var counter = UInt64(0)
     var pushToken: Data?
     var phone_pk: Bytes?
@@ -652,7 +652,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
         case .waitForSessionNonceEphemeralKey:
             if data.count == 24 + 32 {
                 let nonce = data[0..<24]
-                let lock_em_pk = data[24...]
+                lock_em_pk = data[24...]
                 if nonce[0] != UInt8(ascii: "L") {
                     os_log(.error, log: appLogger, "Received invalid nonce %d while in state waitForSessionNonceEphemeralKey", nonce[0])
                     peripheral.disconnect(UcBleError.protocolError)
@@ -662,7 +662,6 @@ extension AppDelegate: UcBlePeripheralDelegate {
                 counter = unpackUInt64(nonce[16...])
                 phone_nonce = Data([UInt8(ascii: "P")]) + nonce[1..<16]
                 lock_nonce = nonce[0..<16]
-                beforeNmKey = sodium.box.beforenm(recipientPublicKey: Array(lock_em_pk), senderSecretKey: keyPair.secretKey)!
                 
                 guard let lora_mac = peripheral.lora_mac() else {
                     os_log(.error, log: appLogger, "Peripheral has no mac")
@@ -677,7 +676,8 @@ extension AppDelegate: UcBlePeripheralDelegate {
                     return
                 }
                 os_log(.default, log: appLogger, "key %{public}s", unlockKey.key.encodeHex())
-                peripheral.send(Data(sodium.box.seal(message: Bytes(unlockKey.key), beforenm: beforeNmKey, nonce: Bytes(phone_nonce+packUInt64(counter)))!))
+                
+                peripheral.send(Data(sodium.box.seal(message: Bytes(unlockKey.key), recipientPublicKey: Array(lock_em_pk), senderSecretKey: keyPair.secretKey, nonce: Bytes(phone_nonce+packUInt64(counter)))!))
                 state = .waitForSigningNonce
             }
             else {
@@ -688,12 +688,12 @@ extension AppDelegate: UcBlePeripheralDelegate {
             
         case .waitForSigningNonce:
             counter += 1
-            if let unlock_nonce = sodium.box.open(authenticatedCipherText: Bytes(data), beforenm: beforeNmKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
+            if let unlock_nonce = sodium.box.open(authenticatedCipherText: Bytes(data), senderPublicKey: Array(lock_em_pk), recipientSecretKey: keyPair.secretKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
                 let sig = sodium.sign.sign(message: unlock_nonce, secretKey: phone_sk!)!
                 os_log(.default, log: appLogger, "sig: %{public}s", Data(sig).encodeHex())
                 os_log(.default, log: appLogger, "pk: %{public}s", Data(phone_pk!).encodeHex())
                 os_log(.default, log: appLogger, "sk: %{public}s", Data(phone_sk!).encodeHex())
-                peripheral.send(Data(sodium.box.seal(message: sig, beforenm: beforeNmKey, nonce: Bytes(phone_nonce + packUInt64(counter)))!))
+                peripheral.send(Data(sodium.box.seal(message: sig, recipientPublicKey: Array(lock_em_pk), senderSecretKey: keyPair.secretKey, nonce: Bytes(phone_nonce + packUInt64(counter)))!))
                 state = .waitForUnlockOk
                 
             }
@@ -705,7 +705,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
             
         case .waitForUnlockOk:
             counter += 1
-            if let result = sodium.box.open(authenticatedCipherText: Bytes(data), beforenm: beforeNmKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
+            if let result = sodium.box.open(authenticatedCipherText: Bytes(data), senderPublicKey: Array(lock_em_pk), recipientSecretKey: keyPair.secretKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
                 if result.count == 1 && result[0] == UInt8(ascii: "O") {
                     os_log(.default, log: appLogger, "We oppend it!")
                     guard let lora_mac = peripheral.lora_mac(),

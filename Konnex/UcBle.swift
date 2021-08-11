@@ -21,7 +21,7 @@ let log = OSLog(subsystem: "ca.unitcircle.Konnex", category: "BLE")
 let service_uuid = CBUUID(string: "da73f2e0-b19e-11e2-9e96-0800200c9a66")
 let txrx_uuid = CBUUID(string: "da73f2e1-b19e-11e2-9e96-0800200c9a66")
 
-protocol UcBlePeripheralDelegate: class {
+protocol UcBlePeripheralDelegate: AnyObject {
     func didReceive(_ peripheral: UcBlePeripheral, data: Data)
     func didConnect(_ peripheral: UcBlePeripheral)
     func didFailToConnect(_ peripheral: UcBlePeripheral, error: Error?)
@@ -284,7 +284,7 @@ func asString(_ state: CBManagerState) -> String {
     default: return "Unknown"
     }
 }
-protocol UcBleCentralDelegate: class {
+protocol UcBleCentralDelegate: AnyObject {
     func didDiscover(_ peripheral: UcBlePeripheral)
     func didBecomeActive()
     func didBecomeInactive()
