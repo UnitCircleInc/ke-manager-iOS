@@ -9,18 +9,63 @@
 import UIKit
 
 class TabBarController: UITabBarController, UITabBarControllerDelegate {
+    
+    var site: SiteDesc?
 
     override func viewDidLoad() {
+        print("TabBarController viewDidLoad \(site ?? SiteDesc(corp: "<none>", site: "<none>", description: "<none>", address: "<none>", gateways: []))")
         super.viewDidLoad()
         self.delegate = self
+        
+        let onlineGateways = site?.gateways.filter { $0.status == "connected" }
+        
+        if onlineGateways?.count ?? 0 > 0 {
+            self.tabBar.items?[0].isEnabled = true
+            self.tabBar.items?[1].isEnabled = true
+            self.tabBar.items?[2].isEnabled = true
+        }
+        else {
+            self.tabBar.items?[0].isEnabled = true
+            self.tabBar.items?[1].isEnabled = false
+            self.tabBar.items?[2].isEnabled = false
+
+        }
+        
 
         // Do any additional setup after loading the view.
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("tabBarController.viewDidAppear index:\(self.selectedIndex)")
+        navigationController?.navigationBar.topItem?.title = site?.site
+
+        tabBarController(self, didSelect: (viewControllers?[self.selectedIndex])!)
+
+    }
+    
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        if let vc = viewController as? MasterKeyTableViewController {
-            vc.clearSelected()
-        }
+        print("tabBarController didSelect \(viewController) index: \(self.selectedIndex)")
+//        navigationController?.navigationBar.topItem?.title = ["Gateways", "Install Lock", "Units"][self.selectedIndex]
+//  To use add Bar Button Item to tab bar controller navigation bar on the right side
+//        if self.selectedIndex == 0 {
+//            navigationController?.navigationBar.topItem?.rightBarButtonItem?.isEnabled = true
+//            navigationController?.navigationBar.topItem?.rightBarButtonItem?.tintColor = nil
+//        }
+//        else {
+//            navigationController?.navigationBar.topItem?.rightBarButtonItem?.isEnabled = false
+//            navigationController?.navigationBar.topItem?.rightBarButtonItem?.tintColor = .clear
+//        }
+//        if let vc = viewController as? KeyTableViewController {
+//            vc.navigationController?.navigationBar.topItem?.title = "Configuration"
+//        }
+//        if let vc = viewController as? ScanViewController {
+//            vc.navigationController?.navigationBar.topItem?.title = "Pair Lock"
+//        }
+//        if let vc = viewController as? MasterKeyTableViewController {
+//            vc.navigationController?.navigationBar.topItem?.title = "Units"
+//            vc.clearSelected()
+//        }
     }
 
     /*

@@ -21,10 +21,10 @@
 		79AC62F5242D511700356983 /* SurrogateCountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC62F4242D511700356983 /* SurrogateCountViewController.swift */; };
 		79AC62F7242FAA2400356983 /* MasterKeyTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC62F6242FAA2400356983 /* MasterKeyTableViewController.swift */; };
 		79AC62F9242FBC9000356983 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC62F8242FBC9000356983 /* TabBarController.swift */; };
-		79C9496C242BBDCA00CE649C /* SurrogateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C9496B242BBDCA00CE649C /* SurrogateViewController.swift */; };
 		79C9496E242BE9E500CE649C /* DatePickerViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C9496D242BE9E500CE649C /* DatePickerViewCell.swift */; };
 		79CB9AF023F0BC8D005295CA /* LockTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB9AEF23F0BC8D005295CA /* LockTableViewCell.swift */; };
 		79CB9AF223F0C13B005295CA /* KeyTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB9AF123F0C13B005295CA /* KeyTableViewController.swift */; };
+		79D026EC26C4304000DE9814 /* SiteTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D026EB26C4304000DE9814 /* SiteTableViewController.swift */; };
 		79E1CD3E22F1DFE200BEE62D /* UcBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD3D22F1DFE200BEE62D /* UcBle.swift */; };
 		79E1CD4022F21EF000BEE62D /* UcUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD3F22F21EF000BEE62D /* UcUtils.swift */; };
 		79E1CD4522F2219D00BEE62D /* Z85.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E1CD4122F2219C00BEE62D /* Z85.swift */; };
@@ -70,11 +70,11 @@
 		79AC62F4242D511700356983 /* SurrogateCountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurrogateCountViewController.swift; sourceTree = "<group>"; };
 		79AC62F6242FAA2400356983 /* MasterKeyTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterKeyTableViewController.swift; sourceTree = "<group>"; };
 		79AC62F8242FBC9000356983 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
-		79C9496B242BBDCA00CE649C /* SurrogateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurrogateViewController.swift; sourceTree = "<group>"; };
 		79C9496D242BE9E500CE649C /* DatePickerViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewCell.swift; sourceTree = "<group>"; };
 		79CB9AEE23E8B4C1005295CA /* Konnex.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Konnex.entitlements; sourceTree = "<group>"; };
 		79CB9AEF23F0BC8D005295CA /* LockTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockTableViewCell.swift; sourceTree = "<group>"; };
 		79CB9AF123F0C13B005295CA /* KeyTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTableViewController.swift; sourceTree = "<group>"; };
+		79D026EB26C4304000DE9814 /* SiteTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteTableViewController.swift; sourceTree = "<group>"; };
 		79E1CD3D22F1DFE200BEE62D /* UcBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UcBle.swift; sourceTree = "<group>"; };
 		79E1CD3F22F21EF000BEE62D /* UcUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UcUtils.swift; sourceTree = "<group>"; };
 		79E1CD4122F2219C00BEE62D /* Z85.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Z85.swift; sourceTree = "<group>"; };
@@ -151,12 +151,12 @@
 				79CB9AEF23F0BC8D005295CA /* LockTableViewCell.swift */,
 				79CB9AF123F0C13B005295CA /* KeyTableViewController.swift */,
 				79398172242941C900000BFE /* ScanViewController.swift */,
-				79C9496B242BBDCA00CE649C /* SurrogateViewController.swift */,
 				79C9496D242BE9E500CE649C /* DatePickerViewCell.swift */,
 				79AC62F4242D511700356983 /* SurrogateCountViewController.swift */,
 				79AC62F6242FAA2400356983 /* MasterKeyTableViewController.swift */,
 				79AC62F8242FBC9000356983 /* TabBarController.swift */,
 				79445D5224466D08000A0F71 /* LogViewController.swift */,
+				79D026EB26C4304000DE9814 /* SiteTableViewController.swift */,
 			);
 			path = Konnex;
 			sourceTree = "<group>";
@@ -328,13 +328,13 @@
 				79E1CD4622F2219D00BEE62D /* CBOR.swift in Sources */,
 				79A8A6CD22E659CA00F09A79 /* AppDelegate.swift in Sources */,
 				79E1CD4A22F2259500BEE62D /* UcLogger.swift in Sources */,
+				79D026EC26C4304000DE9814 /* SiteTableViewController.swift in Sources */,
 				79E1CD3E22F1DFE200BEE62D /* UcBle.swift in Sources */,
 				79CB9AF023F0BC8D005295CA /* LockTableViewCell.swift in Sources */,
 				79CB9AF223F0C13B005295CA /* KeyTableViewController.swift in Sources */,
 				79E1CD4822F2219D00BEE62D /* CRC32C.swift in Sources */,
 				79AC62F7242FAA2400356983 /* MasterKeyTableViewController.swift in Sources */,
 				79398173242941C900000BFE /* ScanViewController.swift in Sources */,
-				79C9496C242BBDCA00CE649C /* SurrogateViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -441,7 +441,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -497,7 +497,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -520,7 +520,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Konnex/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -547,7 +547,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = Konnex/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

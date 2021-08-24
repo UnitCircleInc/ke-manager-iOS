@@ -10,6 +10,10 @@ import Sodium
 import os.log
 import UserNotifications
 
+extension Notification.Name {
+    static let sitesDidChanged = Notification.Name("SitesDidChange")
+}
+
 let sodium = Sodium()
 
 let appLogger = OSLog(subsystem: "ca.unitcircle.Konnex", category: "App")
@@ -155,10 +159,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var pushToken: Data?
     var phone_pk: Bytes?
     var phone_sk: Bytes?
-    var view : KeyTableViewController?
-    var masterView: MasterKeyTableViewController?
     var scanning = false
     var keys: [String: [String: Key]] = [:]
+    var sites: [SiteDesc] = []
+    var units: [String: [String: UnitDesc]] = [:]
     var urlTasks: [URLSessionTask] = []
     var backgroundCompletionHandler: (() -> Void)?
 
@@ -315,6 +319,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         default:
             os_log(.default, log: appLogger, "Unexpected return value for SecItemCopyMatching")
         }
+        requestSites()
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -328,7 +333,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         if aps["content-available"] as? Int == 1 {
             DispatchQueue.main.async { [weak self] in
-                self?.requestKeys()
+                self?.requestSites()
                 completionHandler(.newData)
             }
         }
@@ -371,7 +376,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         task.resume()
     }
     
-    
     func requestKeys() {
         let reqdata: [String: Any] = [:]
         let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
@@ -401,21 +405,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         urlTasks.append(task)
         task.resume()
     }
-    
-    func requestSurrogate(lock: String, surrogate: String, count: UInt64, expiry: UInt64) {
-        let reqdata: [String: Any] = ["lock": lock, "surrogate": surrogate, "count": count, "expiry": expiry]
-        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
-        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-surrogate data: %{public}s", Data(enc_req).encodeHex())
-        let url = URL(string: "https://www.qubyte.ca/api/v1/request-surrogate")!
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-        let task = session.downloadTask(with: req)
-        task.taskDescription = "request-surrogate"
-        urlTasks.append(task)
-        task.resume()
-    }
+ 
     
     func assignLockToUnit(_ unit: Unit, lock: Lock) {
         let reqdata: [String: Any] = ["corp": unit.corp, "site": unit.site, "unit": unit.unit, "lock": lock.lock]
@@ -443,6 +433,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
         let task = session.downloadTask(with: req)
         task.taskDescription = "units"
+        urlTasks.append(task)
+        task.resume()
+    }
+    
+    func requestSites() {
+        let reqdata: [String: Any] = [:]
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/sites data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/sites")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
+        let task = session.downloadTask(with: req)
+        task.taskDescription = "sites"
         urlTasks.append(task)
         task.resume()
     }
@@ -509,23 +514,26 @@ extension AppDelegate: URLSessionDownloadDelegate {
                    let unit = unitdesc["unit"] as? String,
                    let id = unitdesc["id"] as? String,
                    let description = unitdesc["description"] as? String,
-                   let battery = unitdesc["battery"] as? Double {
+                   let battery = unitdesc["battery"] as? Double,
+                   let paidthru = unitdesc["paidthru"] as? Double {
                     if newUnits[description] == nil {
                         newUnits[description] = [:]
                     }
                     if let lock = unitdesc["lock"] as? String {
-                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: lock, battery: battery)
+                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: lock, battery: battery, paidthru: Date(timeIntervalSince1970: paidthru))
                     }
                     else {
-                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: nil, battery: battery)
+                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: nil, battery: battery,  paidthru: Date(timeIntervalSince1970: paidthru))
                     }
                 }
             }
-            self.masterView?.updateUnits(newUnits)
+            self.units = newUnits
         }
         else {
+            units = [:]
             os_log(.default, log: appLogger, "unable to process units response {public}%s", Data(data).encodeHex())
         }
+        NotificationCenter.default.post(Notification(name: Notification.Name.sitesDidChanged))
     }
     
     func handleKeys(data: Data) {
@@ -558,11 +566,49 @@ extension AppDelegate: URLSessionDownloadDelegate {
 
             // TODO Need to persist keys to database so can get them back n relaunch
             self.keys = newkeys
-            self.view?.updateKeys(self.keys)
+            //self.view?.updateKeys(self.keys)
         }
         else {
             os_log(.default, log: appLogger, "unable to process keys response {public}%s", Data(data).encodeHex())
         }
+    }
+    
+    func handleSites(data: Data) {
+        if let z85enc = String(data: data, encoding: .utf8),
+           let cborenc =  z85enc.decodeZ85(),
+           let items = try? CBOR.decode(cborenc),
+           items.count == 1,
+           let sites = items[0] as? [Any] {
+            var newsites: [SiteDesc] = []
+            for item in sites {
+                if let site = item as? [String: Any],
+                   let corp = site["corp"] as? String,
+                   let sitename = site["site"] as? String,
+                   let description = site["description"] as? String,
+                   let address = site["address"] as? String,
+                   let gateways = site["gateways"] as? [[String: Any]] {
+                    var newgateways: [GatewayDesc] = []
+                    for gateway in gateways {
+                        if let id = gateway["id"] as? String,
+                           let date = gateway["date"] as? Double,
+                           let status = gateway["status"] as? String {
+                            let gw = GatewayDesc(id: id, status: status, last_update: Date(timeIntervalSince1970: date))
+                            newgateways.append(gw)
+                        }
+                    }
+                    let newsite = SiteDesc(corp: corp, site: sitename, description: description, address: address, gateways: newgateways)
+                    newsites.append(newsite)
+                }
+            }
+
+            // TODO Need to persist keys to database so can get them back n relaunch
+            self.sites = newsites
+        }
+        else {
+            os_log(.default, log: appLogger, "unable to process keys response {public}%s", Data(data).encodeHex())
+            sites = []
+        }
+        requestUnits()
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
@@ -585,6 +631,9 @@ extension AppDelegate: URLSessionDownloadDelegate {
                 }
                 else if desc == "request-surrogate" {
                     // Nothing to do
+                }
+                else if desc == "sites" {
+                    handleSites(data: data)
                 }
                 else {
                     os_log(.default, log: appLogger, "unknown data task type {public}%s", desc)
@@ -717,7 +766,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
                     }
                     
                     // TODO Fix me keys[lora_mac.encodeHex()]?["status"] = "unlocked"
-                    view?.updateKeyStatus(unlockKey, status: "unlocked")
+                    //view?.updateKeyStatus(unlockKey, status: "unlocked")
                 }
             }
             //peripheral.disconnect(UcBleError.protocolError)
@@ -751,7 +800,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
         }
         
         // TODO Fix me keys[lora_mac.encodeHex()]?["status"] = "locked"
-        view?.updateKeyStatus(unlockKey, status: "locked")
+        //view?.updateKeyStatus(unlockKey, status: "locked")
         os_log(.default, log: appLogger, "didDisconnect(%{public}s)", peripheral.identifier.description)
         if state != .done {
             
