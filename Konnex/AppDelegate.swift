@@ -510,21 +510,14 @@ extension AppDelegate: URLSessionDownloadDelegate {
            let units = items[0] as? [Any] {
             var newUnits: [String: [String: UnitDesc]] = [:]
             for item in units {
-                if let unitdesc = item as? [String: Any],
-                   let unit = unitdesc["unit"] as? String,
-                   let id = unitdesc["id"] as? String,
-                   let description = unitdesc["description"] as? String,
-                   let battery = unitdesc["battery"] as? Double,
-                   let paidthru = unitdesc["paidthru"] as? Double {
-                    if newUnits[description] == nil {
-                        newUnits[description] = [:]
+                if let unitdesc = UnitDesc(cbor: item) {
+                    if newUnits[unitdesc.description] == nil {
+                        newUnits[unitdesc.description] = [:]
                     }
-                    if let lock = unitdesc["lock"] as? String {
-                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: lock, battery: battery, paidthru: Date(timeIntervalSince1970: paidthru))
-                    }
-                    else {
-                        newUnits[description]![unit] = UnitDesc(unit: unit, id: id, selected: false, lock: nil, battery: battery,  paidthru: Date(timeIntervalSince1970: paidthru))
-                    }
+                    newUnits[unitdesc.description]![unitdesc.unit] = unitdesc
+                }
+                else {
+                    print("unit decode failed")
                 }
             }
             self.units = newUnits

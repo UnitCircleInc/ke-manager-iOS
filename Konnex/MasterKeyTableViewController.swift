@@ -26,6 +26,31 @@ struct KeyLogItem: Codable {
     var event: String
 }
 
+extension Key {
+    init?(cbor: Any?) {
+        if let key = cbor as? [String: Any],
+           let keydata = key["key"] as? Data,
+           let keylock = key["lock"] as? String,
+           let keykind = key["kind"] as? String,
+           let keydesc = key["description"] as? String,
+           let keyaddress = key["address"] as? String,
+           let keyunit = key["unit"] as? String,
+           let keylog = key["log"] as? [[String:Any]] {
+            var logitems: [KeyLogItem] = []
+            for logitem in keylog {
+                if let event = logitem["event"] as? String,
+                   let date = logitem["date"] as? Double {
+                    let log = KeyLogItem(date: Date(timeIntervalSince1970: date), event: event)
+                    logitems.append(log)
+                }
+            }
+            self = Key(key: keydata, lock_pk: keylock, kind: keykind, description: keydesc, address: keyaddress, unit: keyunit, status: "locked", log: logitems)
+        }
+        else {
+            return nil
+        }
+    }
+}
 
 public enum MyUIColor {
     public static var label: UIColor {
@@ -39,24 +64,53 @@ public enum MyUIColor {
 struct UnitDesc: Codable {
     var unit: String
     var id: String
-    var selected: Bool
+    var description: String
     var lock: String?
+    var key: Key?
     var battery: Double
-    var paidthru: Date
+    var charge: ChargeState
+    var status: UnitStatus
+}
+
+extension UnitDesc {
+    init?(cbor: Any) {
+        if let unitdesc = cbor as? [String: Any],
+          let unit = unitdesc["unit"] as? String,
+          let id = unitdesc["id"] as? String,
+          let description = unitdesc["description"] as? String,
+          let battery = unitdesc["battery"] as? Double,
+          let iCharge = unitdesc["charge"] as? UInt64,
+          let charge = ChargeState(rawValue: Int(iCharge)),
+          let iStatus = unitdesc["status"] as? UInt64,
+          let status = UnitStatus(rawValue: Int(iStatus)) {
+            let key = unitdesc["key"]
+            let lock = unitdesc["lock"] as? String
+            self = UnitDesc(unit: unit, id: id, description: description, lock: lock, key: Key(cbor: key), battery: battery, charge: charge, status: status)
+        }
+        else {
+            return nil
+        }
+    }
 }
 
 enum SelectionFilter {
     case all
     case vacant
-    case cleaning
+    case occupied
+    case unavailable
     case lowBattery
     case needsCharging
     case charging
     case charged
 }
 
-enum BatteryState {
-    case lowBattery
+
+enum UnitStatus: Int, Codable {
+    case vacant
+    case occupied
+    case unavailable
+}
+enum ChargeState: Int, Codable {
     case needsCharging
     case charging
     case charged
@@ -114,27 +168,32 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
                 self.vacantUnits.setTitle("Vacant", for: .normal)
                 self.updateUnits()
             }),
-            UIAction(title: "Cleaning", image: nil, identifier: nil, handler: {(_) in
-                self.filter = .cleaning
-                self.vacantUnits.setTitle("Cleaning", for: .normal)
+            UIAction(title: "Occupied", image: nil, identifier: nil, handler: {(_) in
+                self.filter = .occupied
+                self.vacantUnits.setTitle("Occupied", for: .normal)
                 self.updateUnits()
             }),
-            UIAction(title: "Low Battery", image: batteryImage(.lowBattery), identifier: nil, handler: {(_) in
+            UIAction(title: "Unavailable", image: nil, identifier: nil, handler: {(_) in
+                self.filter = .unavailable
+                self.vacantUnits.setTitle("Unavailable", for: .normal)
+                self.updateUnits()
+            }),
+            UIAction(title: "Low Battery", image: batteryImage(charge: .ok, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .lowBattery
                 self.vacantUnits.setTitle("Low Battery", for: .normal)
                 self.updateUnits()
             }),
-            UIAction(title: "Needs Charging", image: batteryImage(.needsCharging), identifier: nil, handler: {(_) in
+            UIAction(title: "Needs Charging", image: batteryImage(charge: .needsCharging, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .needsCharging
                 self.vacantUnits.setTitle("Needs Charging", for: .normal)
                 self.updateUnits()
             }),
-            UIAction(title: "Charging", image: batteryImage(.charging), identifier: nil, handler: {(_) in
+            UIAction(title: "Charging", image: batteryImage(charge: .charging, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .charging
                 self.vacantUnits.setTitle("Charging", for: .normal)
                 self.updateUnits()
             }),
-            UIAction(title: "Charged", image: batteryImage(.charged), identifier: nil, handler: {(_) in
+            UIAction(title: "Charged", image: batteryImage(charge: .charged, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .charged
                 self.vacantUnits.setTitle("Charged", for: .normal)
                 self.updateUnits()
@@ -166,31 +225,35 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
         }
         switch filter {
         case .all: break
-        case .charged:
+        case .vacant:
             units = units.filter { (unit: UnitDesc) -> Bool in
-                return batteryState(unit.battery) == .charged
+                return unit.status == .vacant
+            }
+        case .occupied:
+            units = units.filter { (unit: UnitDesc) -> Bool in
+                return unit.status == .occupied
+            }
+        case .unavailable:
+            units = units.filter { (unit: UnitDesc) -> Bool in
+                return unit.status == .unavailable
+            }
+       case .charged:
+            units = units.filter { (unit: UnitDesc) -> Bool in
+                return unit.charge == .charged
             }
         case .charging:
             units = units.filter { (unit: UnitDesc) -> Bool in
-                return batteryState(unit.battery) == .charging
-            }
-        case .cleaning:
-            units = units.filter { (unit: UnitDesc) -> Bool in
-                return true
+                return unit.charge == .charging
             }
         case .lowBattery:
             units = units.filter { (unit: UnitDesc) -> Bool in
-                return batteryState(unit.battery) == .lowBattery
+                return unit.battery < 25.0 && unit.charge == .ok
             }
         case .needsCharging:
             units = units.filter { (unit: UnitDesc) -> Bool in
-                return batteryState(unit.battery) == .needsCharging
+                return unit.charge == .needsCharging
             }
-        case .vacant:
-            units = units.filter { (unit: UnitDesc) -> Bool in
-                return true
-            }
-        }
+         }
         DispatchQueue.main.async {
             self.tableView.refreshControl?.endRefreshing()
             self.tableView.reloadData()
@@ -301,28 +364,8 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
 //        return sections[section]
 //    }
     
-    func batteryState(_ percent: Double) -> BatteryState {
-        if percent < 20.0 {
-            return .lowBattery
-        }
-        else if percent < 40.0 {
-            return .needsCharging
-        }
-        else if percent < 60.0 {
-            return .charging
-        }
-        else if percent < 80.0 {
-            return .charged
-        }
-        else {
-            return .ok
-        }
-    }
-    
-    func batteryImage(_ state: BatteryState) -> UIImage {
-        switch state {
-        case .lowBattery:
-            return UIImage(systemName: "battery.0")!.withTintColor(.systemRed, renderingMode: .alwaysOriginal)
+    func batteryImage(charge: ChargeState, battery: Double) -> UIImage {
+        switch charge {
         case .needsCharging:
             return UIImage(systemName: "battery.25")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
         case .charging:
@@ -330,7 +373,12 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
         case .charged:
             return UIImage(systemName: "battery.100.bolt")!.withTintColor(.systemGreen, renderingMode: .alwaysOriginal)
         case .ok:
-            return UIImage(systemName: "battery.100")!.withTintColor(.black, renderingMode: .alwaysOriginal)
+            if battery < 25.0 {
+                return UIImage(systemName: "battery.0")!.withTintColor(.systemRed, renderingMode: .alwaysOriginal)
+            }
+            else {
+                return UIImage(systemName: "battery.100")!.withTintColor(.black, renderingMode: .alwaysOriginal)
+            }
         }
     }
     
@@ -340,9 +388,25 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
         cell.textLabel?.text = unit.unit
         //cell.textLabel?.textColor = units[section]![key]?.lock == nil ? UIColor.systemGray : MyUIColor.label
  
-        cell.accessoryView = UIImageView(image: batteryImage(batteryState(unit.battery)))
-        cell.detailTextLabel?.text = "vacant"
+        
+        cell.accessoryView = UIImageView(image: batteryImage(charge: unit.charge, battery: unit.battery))
+        var unitStatus: String
+        switch unit.status {
+        case .vacant: unitStatus = "vacant "
+        case .occupied: unitStatus = "occupied "
+        case .unavailable: unitStatus = "unavailable "
+        }
         //cell.detailTextLabel?.attributedText = nil
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = UIImage(systemName: "key")
+        if unit.key == nil {
+            imageAttachment.image = UIImage(systemName: "key.fill")?.withAlpha(0.0)
+        }
+        imageAttachment.bounds = CGRect(x: 0, y: -5, width: imageAttachment.image!.size.width, height: imageAttachment.image!.size.height)
+        let aString1 = NSAttributedString(attachment: imageAttachment)
+        let aString2 = NSMutableAttributedString(string: unitStatus)
+        aString2.append(aString1)
+        cell.detailTextLabel?.attributedText = aString2
         return cell
     }
 
@@ -430,3 +494,10 @@ extension MasterKeyTableViewController: UISearchBarDelegate {
 //    filterContentsForSearchText(searchBar.text!)
 //  }
 //}
+extension UIImage {
+    func withAlpha(_ a: CGFloat) -> UIImage {
+        return UIGraphicsImageRenderer(size: size, format: imageRendererFormat).image { (_) in
+            draw(in: CGRect(origin: .zero, size: size), blendMode: .normal, alpha: a)
+        }
+    }
+}
