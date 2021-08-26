@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="vQ8-bb-5ky">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -51,12 +50,11 @@
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="keyTable" destination="ZVR-BB-BAx" id="L5i-C5-dAn"/>
-                        <segue destination="wdi-fr-mDP" kind="show" identifier="LogSegue" id="07j-LU-Akc"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5QD-uV-aE7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1791" y="832"/>
+            <point key="canvasLocation" x="1916" y="955"/>
         </scene>
         <!--Units-->
         <scene sceneID="O6B-dB-u5I">
@@ -140,7 +138,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jqm-Gk-SaA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3075.36231884058" y="-404.46428571428572"/>
+            <point key="canvasLocation" x="-462" y="955"/>
         </scene>
         <!--Site-->
         <scene sceneID="6Ik-On-eup">
@@ -181,7 +179,9 @@
                             <outlet property="delegate" destination="33A-yA-4Qp" id="wzt-gl-rNJ"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Sites" id="0bE-U8-6lZ"/>
+                    <navigationItem key="navigationItem" title="Sites" id="0bE-U8-6lZ">
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="questionmark.circle" catalog="system" id="0hI-4H-Sc7"/>
+                    </navigationItem>
                     <connections>
                         <segue destination="BKm-Wc-2Mc" kind="show" identifier="SiteDetail" id="mff-MK-66I"/>
                     </connections>
@@ -307,7 +307,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4sp-2s-ZbX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1916" y="66"/>
+            <point key="canvasLocation" x="688" y="955"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="8t2-Sw-x5x">
@@ -321,59 +321,14 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="tEf-RK-UUb" kind="relationship" relationship="viewControllers" id="3cZ-Tf-2RI"/>
-                        <segue destination="WNU-hP-8Lp" kind="relationship" relationship="viewControllers" id="0sQ-M8-Tmo"/>
                         <segue destination="9zk-eS-KGN" kind="relationship" relationship="viewControllers" id="B6N-Jk-yRG"/>
+                        <segue destination="WNU-hP-8Lp" kind="relationship" relationship="viewControllers" id="0sQ-M8-Tmo"/>
+                        <segue destination="tEf-RK-UUb" kind="relationship" relationship="viewControllers" id="3cZ-Tf-2RI"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5FF-6T-xBJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="410.14492753623193" y="115.17857142857142"/>
-        </scene>
-        <!--Log View Controller-->
-        <scene sceneID="vmj-Zd-UyK">
-            <objects>
-                <tableViewController id="wdi-fr-mDP" customClass="LogViewController" customModule="Konnex" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Vaa-Nd-7cE">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="LogCell" textLabel="AtN-aI-XJM" detailTextLabel="1hT-HJ-1ug" style="IBUITableViewCellStyleValue1" id="K2r-RQ-ILe">
-                                <rect key="frame" x="0.0" y="24.5" width="414" height="43.5"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="K2r-RQ-ILe" id="BZl-8P-din">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="AtN-aI-XJM">
-                                            <rect key="frame" x="20" y="12" width="33" height="20.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1hT-HJ-1ug">
-                                            <rect key="frame" x="350" y="12" width="44" height="20.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="wdi-fr-mDP" id="GSo-Rw-hwm"/>
-                            <outlet property="delegate" destination="wdi-fr-mDP" id="qVM-jK-AGQ"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" id="5Gs-ur-eri"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="qeY-l1-8us" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1462" y="1187"/>
+            <point key="canvasLocation" x="687" y="116"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="kp7-RH-gjN">
@@ -393,11 +348,25 @@
             </objects>
             <point key="canvasLocation" x="-1494.2028985507247" y="115.84821428571428"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="nrn-w4-uMq">
+            <objects>
+                <navigationController id="z88-4v-vNI" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="qNG-2b-iG2">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RLV-ff-Njs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1916" y="127"/>
+        </scene>
     </scenes>
     <resources>
         <image name="gearshape.fill" catalog="system" width="128" height="121"/>
         <image name="list.bullet" catalog="system" width="128" height="88"/>
         <image name="plus" width="25" height="25"/>
+        <image name="questionmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

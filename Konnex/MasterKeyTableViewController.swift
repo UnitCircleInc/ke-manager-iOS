@@ -98,7 +98,6 @@ enum SelectionFilter {
     case vacant
     case occupied
     case unavailable
-    case lowBattery
     case needsCharging
     case charging
     case charged
@@ -178,11 +177,6 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
                 self.vacantUnits.setTitle("Unavailable", for: .normal)
                 self.updateUnits()
             }),
-            UIAction(title: "Low Battery", image: batteryImage(charge: .ok, battery: 0), identifier: nil, handler: {(_) in
-                self.filter = .lowBattery
-                self.vacantUnits.setTitle("Low Battery", for: .normal)
-                self.updateUnits()
-            }),
             UIAction(title: "Needs Charging", image: batteryImage(charge: .needsCharging, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .needsCharging
                 self.vacantUnits.setTitle("Needs Charging", for: .normal)
@@ -244,10 +238,6 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
         case .charging:
             units = units.filter { (unit: UnitDesc) -> Bool in
                 return unit.charge == .charging
-            }
-        case .lowBattery:
-            units = units.filter { (unit: UnitDesc) -> Bool in
-                return unit.battery < 25.0 && unit.charge == .ok
             }
         case .needsCharging:
             units = units.filter { (unit: UnitDesc) -> Bool in
@@ -365,16 +355,26 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
 //    }
     
     func batteryImage(charge: ChargeState, battery: Double) -> UIImage {
+        let gray = UIColor(red: 0x67/255.0, green: 0x67/255.0, blue: 0x67/255.0, alpha: 1.0)
         switch charge {
         case .needsCharging:
-            return UIImage(systemName: "battery.25")!.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
+            return UIImage(named: "battery.needs.charging")!.withRenderingMode(.alwaysOriginal)
         case .charging:
-            return UIImage(systemName: "battery.100.bolt")!.withTintColor(.systemOrange, renderingMode: .alwaysOriginal)
+            return UIImage(systemName: "battery.100.bolt")!.withTintColor(UIColor(red: 0.402, green: 0.402, blue: 0.402, alpha: 1.0), renderingMode: .alwaysOriginal)
         case .charged:
-            return UIImage(systemName: "battery.100.bolt")!.withTintColor(.systemGreen, renderingMode: .alwaysOriginal)
+            return UIImage(named: "battery.100.bolt")!.withRenderingMode(.alwaysOriginal)
         case .ok:
-            if battery < 25.0 {
-                return UIImage(systemName: "battery.0")!.withTintColor(.systemRed, renderingMode: .alwaysOriginal)
+            if battery < 12.5 {
+                return UIImage(systemName: "battery.0")!.withTintColor(gray, renderingMode: .alwaysOriginal)
+            }
+            if battery < 25.0 + 12.5 {
+                return UIImage(systemName: "battery.25")!.withTintColor(gray, renderingMode: .alwaysOriginal)
+            }
+            else if battery < 50.0 + 12.5 {
+                return UIImage(named: "battery.50")!.withTintColor(gray, renderingMode: .alwaysOriginal)
+            }
+            else if battery < 75.0 + 12.5 {
+                return UIImage(named: "battery.75")!.withTintColor(gray, renderingMode: .alwaysOriginal)
             }
             else {
                 return UIImage(systemName: "battery.100")!.withTintColor(.black, renderingMode: .alwaysOriginal)
@@ -387,9 +387,11 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
         let unit = units[indexPath.row]
         cell.textLabel?.text = unit.unit
         //cell.textLabel?.textColor = units[section]![key]?.lock == nil ? UIColor.systemGray : MyUIColor.label
- 
-        
+
         cell.accessoryView = UIImageView(image: batteryImage(charge: unit.charge, battery: unit.battery))
+        if unit.charge == .charged || unit.charge == .needsCharging {
+            cell.accessoryView!.frame = CGRect(x: 0.0, y: 0.0, width: 29.0*0.85, height: 13.0*0.9)
+        }
         var unitStatus: String
         switch unit.status {
         case .vacant: unitStatus = "vacant "

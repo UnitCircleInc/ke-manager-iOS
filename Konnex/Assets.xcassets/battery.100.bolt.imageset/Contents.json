@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "battery25.png",
+      "filename" : "battery.100.bolt.sean.svg",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "battery25@2.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "battery25@3.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

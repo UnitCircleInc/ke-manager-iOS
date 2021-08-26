@@ -39,9 +39,16 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate {
         super.viewDidAppear(animated)
         print("tabBarController.viewDidAppear index:\(self.selectedIndex)")
         navigationController?.navigationBar.topItem?.title = site?.site
+        navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "questionmark.circle"), style: .plain, target: self, action: #selector(self.helpPressed(_:)))
+        //navigationController?.navigationBar.topItem?.rightBarButtonItem?.image =
+        
 
         tabBarController(self, didSelect: (viewControllers?[self.selectedIndex])!)
 
+    }
+    
+    @objc func helpPressed(_ sender: UIBarButtonItem!) {
+        print("help pressed")
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
