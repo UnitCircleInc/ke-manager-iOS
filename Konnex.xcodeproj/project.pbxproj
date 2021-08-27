@@ -10,6 +10,9 @@
 		79126E5726C31F1900734556 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = 79126E5626C31F1900734556 /* Clibsodium */; };
 		79126E5926C31F1900734556 /* Sodium in Frameworks */ = {isa = PBXBuildFile; productRef = 79126E5826C31F1900734556 /* Sodium */; };
 		79398173242941C900000BFE /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79398172242941C900000BFE /* ScanViewController.swift */; };
+		7943633E26D83D4B00195D65 /* HelpSlide.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7943633D26D83D4B00195D65 /* HelpSlide.xib */; };
+		7943634026D83DBC00195D65 /* HelpSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7943633F26D83DBC00195D65 /* HelpSlide.swift */; };
+		7943634226D842E400195D65 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7943634126D842E400195D65 /* HelpViewController.swift */; };
 		79445D5324466D08000A0F71 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79445D5224466D08000A0F71 /* LogViewController.swift */; };
 		79A8A6CD22E659CA00F09A79 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */; };
 		79A8A6CF22E659CA00F09A79 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6CE22E659CA00F09A79 /* ViewController.swift */; };
@@ -53,6 +56,9 @@
 
 /* Begin PBXFileReference section */
 		79398172242941C900000BFE /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
+		7943633D26D83D4B00195D65 /* HelpSlide.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HelpSlide.xib; sourceTree = "<group>"; };
+		7943633F26D83DBC00195D65 /* HelpSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSlide.swift; sourceTree = "<group>"; };
+		7943634126D842E400195D65 /* HelpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
 		79445D5224466D08000A0F71 /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		79A8A6C922E659CA00F09A79 /* Konnex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Konnex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -143,6 +149,7 @@
 				79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */,
 				79A8A6CE22E659CA00F09A79 /* ViewController.swift */,
 				79A8A6D022E659CA00F09A79 /* Main.storyboard */,
+				7943634126D842E400195D65 /* HelpViewController.swift */,
 				79A8A6D322E659CC00F09A79 /* Assets.xcassets */,
 				79A8A6D522E659CC00F09A79 /* LaunchScreen.storyboard */,
 				79A8A6D822E659CC00F09A79 /* Info.plist */,
@@ -157,6 +164,8 @@
 				79AC62F8242FBC9000356983 /* TabBarController.swift */,
 				79445D5224466D08000A0F71 /* LogViewController.swift */,
 				79D026EB26C4304000DE9814 /* SiteTableViewController.swift */,
+				7943633D26D83D4B00195D65 /* HelpSlide.xib */,
+				7943633F26D83DBC00195D65 /* HelpSlide.swift */,
 			);
 			path = Konnex;
 			sourceTree = "<group>";
@@ -290,6 +299,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7943633E26D83D4B00195D65 /* HelpSlide.xib in Resources */,
 				79A8A6D722E659CC00F09A79 /* LaunchScreen.storyboard in Resources */,
 				79A8A6D422E659CC00F09A79 /* Assets.xcassets in Resources */,
 				79A8A6D222E659CA00F09A79 /* Main.storyboard in Resources */,
@@ -329,12 +339,14 @@
 				79A8A6CD22E659CA00F09A79 /* AppDelegate.swift in Sources */,
 				79E1CD4A22F2259500BEE62D /* UcLogger.swift in Sources */,
 				79D026EC26C4304000DE9814 /* SiteTableViewController.swift in Sources */,
+				7943634026D83DBC00195D65 /* HelpSlide.swift in Sources */,
 				79E1CD3E22F1DFE200BEE62D /* UcBle.swift in Sources */,
 				79CB9AF023F0BC8D005295CA /* LockTableViewCell.swift in Sources */,
 				79CB9AF223F0C13B005295CA /* KeyTableViewController.swift in Sources */,
 				79E1CD4822F2219D00BEE62D /* CRC32C.swift in Sources */,
 				79AC62F7242FAA2400356983 /* MasterKeyTableViewController.swift in Sources */,
 				79398173242941C900000BFE /* ScanViewController.swift in Sources */,
+				7943634226D842E400195D65 /* HelpViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

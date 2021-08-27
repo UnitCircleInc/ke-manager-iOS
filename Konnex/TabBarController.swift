@@ -48,6 +48,8 @@ class TabBarController: UITabBarController, UITabBarControllerDelegate {
     }
     
     @objc func helpPressed(_ sender: UIBarButtonItem!) {
+        let helpVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "HelpViewController") as HelpViewController
+        navigationController?.pushViewController(helpVC, animated: true)
         print("help pressed")
     }
     

@@ -330,6 +330,59 @@
             </objects>
             <point key="canvasLocation" x="687" y="116"/>
         </scene>
+        <!--Help View Controller-->
+        <scene sceneID="7qm-16-y6b">
+            <objects>
+                <viewController storyboardIdentifier="HelpViewController" id="x7c-6I-fWm" customClass="HelpViewController" customModule="Konnex" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="9wc-ZF-tyQ">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yds-XP-uoi">
+                                <rect key="frame" x="188.5" y="824" width="37" height="30"/>
+                                <state key="normal" title="Done"/>
+                                <connections>
+                                    <action selector="doneButtonPressed:" destination="x7c-6I-fWm" eventType="touchUpInside" id="0rt-z2-gjq"/>
+                                </connections>
+                            </button>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BJO-09-m2E">
+                                <rect key="frame" x="0.0" y="44" width="414" height="721"/>
+                                <viewLayoutGuide key="contentLayoutGuide" id="o7D-EH-Juu"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="U8x-XI-9mD"/>
+                            </scrollView>
+                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" hidesForSinglePage="YES" numberOfPages="5" translatesAutoresizingMaskIntoConstraints="NO" id="3HQ-Z7-1jX">
+                                <rect key="frame" x="0.0" y="788" width="414" height="28"/>
+                                <color key="pageIndicatorTintColor" systemColor="systemGray2Color"/>
+                                <color key="currentPageIndicatorTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="pageChanged:" destination="x7c-6I-fWm" eventType="valueChanged" id="1G6-x9-Vd1"/>
+                                </connections>
+                            </pageControl>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Qfz-eE-Dod"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="BJO-09-m2E" firstAttribute="leading" secondItem="Qfz-eE-Dod" secondAttribute="leading" id="6zl-lY-EtS"/>
+                            <constraint firstItem="BJO-09-m2E" firstAttribute="top" secondItem="Qfz-eE-Dod" secondAttribute="top" id="BVi-vn-O1m"/>
+                            <constraint firstItem="3HQ-Z7-1jX" firstAttribute="leading" secondItem="Qfz-eE-Dod" secondAttribute="leading" id="DaJ-uj-BZ0"/>
+                            <constraint firstItem="Qfz-eE-Dod" firstAttribute="bottom" secondItem="Yds-XP-uoi" secondAttribute="bottom" constant="8" id="L6j-US-ADz"/>
+                            <constraint firstItem="Yds-XP-uoi" firstAttribute="centerX" secondItem="9wc-ZF-tyQ" secondAttribute="centerX" id="XWc-Jd-A4A"/>
+                            <constraint firstItem="3HQ-Z7-1jX" firstAttribute="centerX" secondItem="9wc-ZF-tyQ" secondAttribute="centerX" id="apn-GF-7eG"/>
+                            <constraint firstItem="Yds-XP-uoi" firstAttribute="top" secondItem="3HQ-Z7-1jX" secondAttribute="bottom" constant="8" id="dog-7Q-6ZH"/>
+                            <constraint firstItem="BJO-09-m2E" firstAttribute="trailing" secondItem="Qfz-eE-Dod" secondAttribute="trailing" id="vd2-FV-eyK"/>
+                            <constraint firstItem="3HQ-Z7-1jX" firstAttribute="top" secondItem="BJO-09-m2E" secondAttribute="bottom" constant="8" id="wzv-ZF-doo"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="doneButton" destination="Yds-XP-uoi" id="C9t-md-JmI"/>
+                        <outlet property="pageControl" destination="3HQ-Z7-1jX" id="fQ6-e9-a4j"/>
+                        <outlet property="scrollView" destination="BJO-09-m2E" id="YZd-uG-qcg"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5Uz-CP-Lq8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1947.826086956522" y="140.625"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="kp7-RH-gjN">
             <objects>
@@ -348,18 +401,20 @@
             </objects>
             <point key="canvasLocation" x="-1494.2028985507247" y="115.84821428571428"/>
         </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="nrn-w4-uMq">
+        <!--View Controller-->
+        <scene sceneID="Iwl-4h-IEQ">
             <objects>
-                <navigationController id="z88-4v-vNI" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="qNG-2b-iG2">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="RLV-ff-Njs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <viewController id="m9f-3d-MUS" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="vC9-Fj-4dx">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="pQN-bd-1dF"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wL7-By-aMX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1916" y="127"/>
+            <point key="canvasLocation" x="826" y="-557"/>
         </scene>
     </scenes>
     <resources>
@@ -369,6 +424,9 @@
         <image name="questionmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray2Color">
+            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
