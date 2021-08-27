@@ -38,6 +38,7 @@ class SiteTableViewController: UITableViewController {
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
         observer = NotificationCenter.default.addObserver(forName: Notification.Name.sitesDidChanged, object: nil, queue: OperationQueue.main, using: { [weak self] (notification) in self?.updateSites()})
+        navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "questionmark.circle"), style: .plain, target: self, action: #selector(self.helpPressed(_:)))
         
         //handleRefreshControl()
         // Uncomment the following line to preserve selection between presentations
@@ -52,6 +53,12 @@ class SiteTableViewController: UITableViewController {
         if let observer = observer {
             NotificationCenter.default.removeObserver(observer)
         }
+    }
+    
+    @objc func helpPressed(_ sender: UIBarButtonItem!) {
+        let helpVC = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "HelpViewController") as HelpViewController
+        navigationController?.pushViewController(helpVC, animated: true)
+        print("help pressed")
     }
     
     @objc func handleRefreshControl() {
