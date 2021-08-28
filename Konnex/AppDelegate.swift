@@ -368,8 +368,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let reqdata: [String: Any] = ["apn-token": push, "token": dectoken]
         let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
         let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
-        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-keys data: %{public}s", Data(enc_req).encodeHex())
-        let url = URL(string: "https://www.qubyte.ca/api/v1/request-keys")!
+        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/sites data: %{public}s", Data(enc_req).encodeHex())
+        let url = URL(string: "https://www.qubyte.ca/api/v1/sites")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
@@ -378,22 +378,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         urlTasks.append(task)
         task.resume()
     }
-    
-    func requestKeys() {
-        let reqdata: [String: Any] = [:]
-        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
-        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-keys data: %{public}s", Data(enc_req).encodeHex())
-        let url = URL(string: "https://www.qubyte.ca/api/v1/request-keys")!
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-        let task = session.downloadTask(with: req)
-        task.taskDescription = "keys"
-        urlTasks.append(task)
-        task.resume()
-    }
-    
+        
     func requestMaster(_ locks: [String]) {
         let reqdata: [String: Any] = ["locks": locks]
         let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
@@ -532,43 +517,6 @@ extension AppDelegate: URLSessionDownloadDelegate {
         NotificationCenter.default.post(Notification(name: Notification.Name.sitesDidChanged))
     }
     
-//    func handleKeys(data: Data) {
-//        if let z85enc = String(data: data, encoding: .utf8),
-//           let cborenc =  z85enc.decodeZ85(),
-//           let items = try? CBOR.decode(cborenc),
-//           items.count == 1,
-//           let keys = items[0] as? [Any] {
-//            var newkeys: [String: [String: Key]] = ["tenant": [:], "master": [:], "surrogate": [:]]
-//            for item in keys {
-//                if let key = item as? [String: Any],
-//                   let keydata = key["key"] as? Data,
-//                   let keylock = key["lock"] as? String,
-//                   let keykind = key["kind"] as? String,
-//                   let keydesc = key["description"] as? String,
-//                   let keyaddress = key["address"] as? String,
-//                   let keyunit = key["unit"] as? String,
-//                   let keylog = key["log"] as? [[String:Any]] {
-//                    var logitems: [KeyLogItem] = []
-//                    for logitem in keylog {
-//                        if let event = logitem["event"] as? String,
-//                           let date = logitem["date"] as? Double {
-//                            let log = KeyLogItem(date: Date(timeIntervalSince1970: date), event: event)
-//                            logitems.append(log)
-//                        }
-//                    }
-//                    newkeys[keykind]![keyunit] = Key(key: keydata, lock_pk: keylock, kind: keykind, description: keydesc, address: keyaddress, unit: keyunit, status: "locked", log: logitems)
-//                }
-//            }
-//
-//            // TODO Need to persist keys to database so can get them back n relaunch
-//            self.keys = newkeys
-//            //self.view?.updateKeys(self.keys)
-//        }
-//        else {
-//            os_log(.default, log: appLogger, "unable to process keys response {public}%s", Data(data).encodeHex())
-//        }
-//    }
-    
     func handleSites(data: Data) {
         if let z85enc = String(data: data, encoding: .utf8),
            let cborenc =  z85enc.decodeZ85(),
@@ -613,9 +561,6 @@ extension AppDelegate: URLSessionDownloadDelegate {
             // This way temp URL can still be accessed and the thread used for OS doesn't get stalled
             let data = try Data(contentsOf: location)
             if let desc = downloadTask.taskDescription {
-//                if desc == "keys" {
-//                    handleKeys(data:data)
-//                }
                 if desc == "units" {
                     handleUnits(data: data)
                 }
@@ -663,27 +608,6 @@ func unpackUInt64(_ v: Data) -> UInt64 {
 
 extension AppDelegate: UcBlePeripheralDelegate {
     func findKeyForLock(_ lock: String) -> Key? {
-//        if let tenantKeys = keys["tenant"] {
-//            for key in tenantKeys {
-//                if key.value.lock_pk == lock {
-//                    return key.value
-//                }
-//            }
-//        }
-//        if let tenantKeys = keys["master"] {
-//            for key in tenantKeys {
-//                if key.value.lock_pk == lock {
-//                    return key.value
-//                }
-//            }
-//        }
-//        if let tenantKeys = keys["surrogate"] {
-//            for key in tenantKeys {
-//                if key.value.lock_pk == lock {
-//                    return key.value
-//                }
-//            }
-//        }
         for siteunits in units.values {
             for unit in siteunits.values {
                 if unit.lock == lock {
