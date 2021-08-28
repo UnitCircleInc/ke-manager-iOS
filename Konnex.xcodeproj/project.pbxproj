@@ -19,7 +19,7 @@
 		79A8A6D722E659CC00F09A79 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79A8A6D522E659CC00F09A79 /* LaunchScreen.storyboard */; };
 		79A8A6E222E659CC00F09A79 /* KonnexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6E122E659CC00F09A79 /* KonnexTests.swift */; };
 		79A8A6ED22E659CC00F09A79 /* KonnexUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A8A6EC22E659CC00F09A79 /* KonnexUITests.swift */; };
-		79AC62F7242FAA2400356983 /* MasterKeyTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC62F6242FAA2400356983 /* MasterKeyTableViewController.swift */; };
+		79AC62F7242FAA2400356983 /* UnitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC62F6242FAA2400356983 /* UnitViewController.swift */; };
 		79AC62F9242FBC9000356983 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79AC62F8242FBC9000356983 /* TabBarController.swift */; };
 		79CB9AF223F0C13B005295CA /* GatewayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CB9AF123F0C13B005295CA /* GatewayViewController.swift */; };
 		79D026EC26C4304000DE9814 /* SiteTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D026EB26C4304000DE9814 /* SiteTableViewController.swift */; };
@@ -66,7 +66,7 @@
 		79A8A6E822E659CC00F09A79 /* KonnexUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KonnexUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6EC22E659CC00F09A79 /* KonnexUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KonnexUITests.swift; sourceTree = "<group>"; };
 		79A8A6EE22E659CC00F09A79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		79AC62F6242FAA2400356983 /* MasterKeyTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterKeyTableViewController.swift; sourceTree = "<group>"; };
+		79AC62F6242FAA2400356983 /* UnitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitViewController.swift; sourceTree = "<group>"; };
 		79AC62F8242FBC9000356983 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		79CB9AEE23E8B4C1005295CA /* Konnex.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Konnex.entitlements; sourceTree = "<group>"; };
 		79CB9AF123F0C13B005295CA /* GatewayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayViewController.swift; sourceTree = "<group>"; };
@@ -146,7 +146,7 @@
 				79E1CD3F22F21EF000BEE62D /* UcUtils.swift */,
 				79CB9AF123F0C13B005295CA /* GatewayViewController.swift */,
 				79398172242941C900000BFE /* ScanViewController.swift */,
-				79AC62F6242FAA2400356983 /* MasterKeyTableViewController.swift */,
+				79AC62F6242FAA2400356983 /* UnitViewController.swift */,
 				79AC62F8242FBC9000356983 /* TabBarController.swift */,
 				79D026EB26C4304000DE9814 /* SiteTableViewController.swift */,
 				7943633D26D83D4B00195D65 /* HelpSlide.xib */,
@@ -324,7 +324,7 @@
 				79E1CD3E22F1DFE200BEE62D /* UcBle.swift in Sources */,
 				79CB9AF223F0C13B005295CA /* GatewayViewController.swift in Sources */,
 				79E1CD4822F2219D00BEE62D /* CRC32C.swift in Sources */,
-				79AC62F7242FAA2400356983 /* MasterKeyTableViewController.swift in Sources */,
+				79AC62F7242FAA2400356983 /* UnitViewController.swift in Sources */,
 				79398173242941C900000BFE /* ScanViewController.swift in Sources */,
 				7943634226D842E400195D65 /* HelpViewController.swift in Sources */,
 			);
