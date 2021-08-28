@@ -132,8 +132,8 @@
                     <tabBarItem key="tabBarItem" title="Units" image="list.bullet" catalog="system" id="5cD-u6-9h6"/>
                     <connections>
                         <outlet property="searchBar" destination="hOw-vG-Jca" id="c65-oc-3Hb"/>
+                        <outlet property="selectedUnits" destination="wLT-WQ-o7i" id="Zmn-5J-nGM"/>
                         <outlet property="tableView" destination="RbB-pa-Xib" id="jCC-Vj-fqo"/>
-                        <outlet property="vacantUnits" destination="wLT-WQ-o7i" id="Zmn-5J-nGM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jqm-Gk-SaA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

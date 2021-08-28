@@ -120,7 +120,7 @@ class UnitViewController: UIViewController, UITableViewDelegate, UITableViewData
   
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var vacantUnits: UIButton!
+    @IBOutlet weak var selectedUnits: UIButton!
     
     
     var observer: NSObjectProtocol?
@@ -139,41 +139,41 @@ class UnitViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         updateUnits()
  
-        vacantUnits.showsMenuAsPrimaryAction = true
-        vacantUnits.menu = UIMenu(title: "Select Menu", image: nil, identifier: nil, options: [], children: [
+        selectedUnits.showsMenuAsPrimaryAction = true
+        selectedUnits.menu = UIMenu(title: "Select Menu", image: nil, identifier: nil, options: [], children: [
             UIAction(title: "All", image: nil, identifier: nil, handler: {(_) in
                 self.filter = .all
-                self.vacantUnits.setTitle("All", for: .normal)
+                self.selectedUnits.setTitle("All", for: .normal)
                 self.updateUnits()
             }),
             UIAction(title: "Vacant", image: nil, identifier: nil, handler: {(_) in
                 self.filter = .vacant
-                self.vacantUnits.setTitle("Vacant", for: .normal)
+                self.selectedUnits.setTitle("Vacant", for: .normal)
                 self.updateUnits()
             }),
             UIAction(title: "Occupied", image: nil, identifier: nil, handler: {(_) in
                 self.filter = .occupied
-                self.vacantUnits.setTitle("Occupied", for: .normal)
+                self.selectedUnits.setTitle("Occupied", for: .normal)
                 self.updateUnits()
             }),
             UIAction(title: "Unavailable", image: nil, identifier: nil, handler: {(_) in
                 self.filter = .unavailable
-                self.vacantUnits.setTitle("Unavailable", for: .normal)
+                self.selectedUnits.setTitle("Unavailable", for: .normal)
                 self.updateUnits()
             }),
             UIAction(title: "Needs Charging", image: batteryImage(charge: .needsCharging, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .needsCharging
-                self.vacantUnits.setTitle("Needs Charging", for: .normal)
+                self.selectedUnits.setTitle("Needs Charging", for: .normal)
                 self.updateUnits()
             }),
             UIAction(title: "Charging", image: batteryImage(charge: .charging, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .charging
-                self.vacantUnits.setTitle("Charging", for: .normal)
+                self.selectedUnits.setTitle("Charging", for: .normal)
                 self.updateUnits()
             }),
             UIAction(title: "Charged", image: batteryImage(charge: .charged, battery: 0), identifier: nil, handler: {(_) in
                 self.filter = .charged
-                self.vacantUnits.setTitle("Charged", for: .normal)
+                self.selectedUnits.setTitle("Charged", for: .normal)
                 self.updateUnits()
             }),
         ])
