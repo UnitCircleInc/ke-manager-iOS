@@ -19,7 +19,7 @@ let viewLogger = OSLog(subsystem: "ca.unitcircle.Konnex", category: "View")
 // Once at least GW is online/offline then other tabs will be enabled.
 
 
-class KeyTableViewController: UITableViewController {
+class GatewayViewController: UITableViewController {
     @IBOutlet var keyTable: UITableView!
     var gateways: [GatewayDesc] = []
     var popup: UIView!
