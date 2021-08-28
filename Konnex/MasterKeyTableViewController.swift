@@ -203,7 +203,7 @@ class MasterKeyTableViewController: UIViewController, UITableViewDelegate, UITab
     
     func updateUnits() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let tabBarController = tabBarController as! TabBarController
+        guard let tabBarController = tabBarController as? TabBarController else { return }
         let site = appDelegate.sites.first { $0.site == tabBarController.site?.site }
         units = appDelegate.units[site!.description]!.values.sorted { $0.unit < $1.unit }
 
