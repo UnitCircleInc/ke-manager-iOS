@@ -95,6 +95,7 @@ extension UnitDesc {
 
 enum SelectionFilter {
     case all
+    case notInstalled
     case vacant
     case occupied
     case unavailable
@@ -105,6 +106,7 @@ enum SelectionFilter {
 
 
 enum UnitStatus: Int, Codable {
+    case notInstalled
     case vacant
     case occupied
     case unavailable
@@ -144,6 +146,11 @@ class UnitViewController: UIViewController, UITableViewDelegate, UITableViewData
             UIAction(title: "All", image: nil, identifier: nil, handler: {(_) in
                 self.filter = .all
                 self.selectedUnits.setTitle("All", for: .normal)
+                self.updateUnits()
+            }),
+            UIAction(title: "Not Installed", image: nil, identifier: nil, handler: {(_) in
+                self.filter = .notInstalled
+                self.selectedUnits.setTitle("Not Installed", for: .normal)
                 self.updateUnits()
             }),
             UIAction(title: "Vacant", image: nil, identifier: nil, handler: {(_) in
@@ -203,6 +210,10 @@ class UnitViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         switch filter {
         case .all: break
+        case .notInstalled:
+            units = units.filter { (unit: UnitDesc) -> Bool in
+                return unit.status == .notInstalled
+            }
         case .vacant:
             units = units.filter { (unit: UnitDesc) -> Bool in
                 return unit.status == .vacant
@@ -280,18 +291,22 @@ class UnitViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.textLabel?.text = unit.unit
 
         cell.accessoryView = UIImageView(image: batteryImage(charge: unit.charge, battery: unit.battery))
+        if unit.status == .notInstalled {
+            cell.accessoryView = UIImageView(image: batteryImage(charge: unit.charge, battery: unit.battery).withAlpha(0.0))
+        }
         if unit.charge == .charged || unit.charge == .needsCharging {
             cell.accessoryView!.frame = CGRect(x: 0.0, y: 0.0, width: 29.0*0.85, height: 13.0*0.9)
         }
         var unitStatus: String
         switch unit.status {
+        case .notInstalled: unitStatus  = ""
         case .vacant: unitStatus = "vacant "
         case .occupied: unitStatus = "occupied "
         case .unavailable: unitStatus = "unavailable "
         }
         let imageAttachment = NSTextAttachment()
         imageAttachment.image = UIImage(systemName: "key")
-        if unit.key == nil {
+        if unit.key == nil || unit.status == .notInstalled {
             imageAttachment.image = UIImage(systemName: "key.fill")?.withAlpha(0.0)
         }
         imageAttachment.bounds = CGRect(x: 0, y: -5, width: imageAttachment.image!.size.width, height: imageAttachment.image!.size.height)
