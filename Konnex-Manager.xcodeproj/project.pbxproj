@@ -54,16 +54,16 @@
 		7943633D26D83D4B00195D65 /* HelpSlide.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HelpSlide.xib; sourceTree = "<group>"; };
 		7943633F26D83DBC00195D65 /* HelpSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSlide.swift; sourceTree = "<group>"; };
 		7943634126D842E400195D65 /* HelpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
-		79A8A6C922E659CA00F09A79 /* Konnex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Konnex.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		79A8A6C922E659CA00F09A79 /* Konnex-Manager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Konnex-Manager.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6CC22E659CA00F09A79 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		79A8A6D122E659CA00F09A79 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		79A8A6D322E659CC00F09A79 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		79A8A6D622E659CC00F09A79 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		79A8A6D822E659CC00F09A79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		79A8A6DD22E659CC00F09A79 /* KonnexTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KonnexTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		79A8A6DD22E659CC00F09A79 /* Konnex-ManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Konnex-ManagerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6E122E659CC00F09A79 /* KonnexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KonnexTests.swift; sourceTree = "<group>"; };
 		79A8A6E322E659CC00F09A79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		79A8A6E822E659CC00F09A79 /* KonnexUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KonnexUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		79A8A6E822E659CC00F09A79 /* Konnex-ManagerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Konnex-ManagerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A8A6EC22E659CC00F09A79 /* KonnexUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KonnexUITests.swift; sourceTree = "<group>"; };
 		79A8A6EE22E659CC00F09A79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		79AC62F6242FAA2400356983 /* UnitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitViewController.swift; sourceTree = "<group>"; };
@@ -120,9 +120,9 @@
 		79A8A6CA22E659CA00F09A79 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				79A8A6C922E659CA00F09A79 /* Konnex.app */,
-				79A8A6DD22E659CC00F09A79 /* KonnexTests.xctest */,
-				79A8A6E822E659CC00F09A79 /* KonnexUITests.xctest */,
+				79A8A6C922E659CA00F09A79 /* Konnex-Manager.app */,
+				79A8A6DD22E659CC00F09A79 /* Konnex-ManagerTests.xctest */,
+				79A8A6E822E659CC00F09A79 /* Konnex-ManagerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -176,9 +176,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		79A8A6C822E659CA00F09A79 /* Konnex */ = {
+		79A8A6C822E659CA00F09A79 /* Konnex-Manager */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 79A8A6F122E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex" */;
+			buildConfigurationList = 79A8A6F122E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex-Manager" */;
 			buildPhases = (
 				79A8A6C522E659CA00F09A79 /* Sources */,
 				79A8A6C622E659CA00F09A79 /* Frameworks */,
@@ -188,18 +188,18 @@
 			);
 			dependencies = (
 			);
-			name = Konnex;
+			name = "Konnex-Manager";
 			packageProductDependencies = (
 				79126E5626C31F1900734556 /* Clibsodium */,
 				79126E5826C31F1900734556 /* Sodium */,
 			);
 			productName = Konnex;
-			productReference = 79A8A6C922E659CA00F09A79 /* Konnex.app */;
+			productReference = 79A8A6C922E659CA00F09A79 /* Konnex-Manager.app */;
 			productType = "com.apple.product-type.application";
 		};
-		79A8A6DC22E659CC00F09A79 /* KonnexTests */ = {
+		79A8A6DC22E659CC00F09A79 /* Konnex-ManagerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 79A8A6F422E659CC00F09A79 /* Build configuration list for PBXNativeTarget "KonnexTests" */;
+			buildConfigurationList = 79A8A6F422E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex-ManagerTests" */;
 			buildPhases = (
 				79A8A6D922E659CC00F09A79 /* Sources */,
 				79A8A6DA22E659CC00F09A79 /* Frameworks */,
@@ -210,14 +210,14 @@
 			dependencies = (
 				79A8A6DF22E659CC00F09A79 /* PBXTargetDependency */,
 			);
-			name = KonnexTests;
+			name = "Konnex-ManagerTests";
 			productName = KonnexTests;
-			productReference = 79A8A6DD22E659CC00F09A79 /* KonnexTests.xctest */;
+			productReference = 79A8A6DD22E659CC00F09A79 /* Konnex-ManagerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		79A8A6E722E659CC00F09A79 /* KonnexUITests */ = {
+		79A8A6E722E659CC00F09A79 /* Konnex-ManagerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 79A8A6F722E659CC00F09A79 /* Build configuration list for PBXNativeTarget "KonnexUITests" */;
+			buildConfigurationList = 79A8A6F722E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex-ManagerUITests" */;
 			buildPhases = (
 				79A8A6E422E659CC00F09A79 /* Sources */,
 				79A8A6E522E659CC00F09A79 /* Frameworks */,
@@ -228,9 +228,9 @@
 			dependencies = (
 				79A8A6EA22E659CC00F09A79 /* PBXTargetDependency */,
 			);
-			name = KonnexUITests;
+			name = "Konnex-ManagerUITests";
 			productName = KonnexUITests;
-			productReference = 79A8A6E822E659CC00F09A79 /* KonnexUITests.xctest */;
+			productReference = 79A8A6E822E659CC00F09A79 /* Konnex-ManagerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -256,7 +256,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 79A8A6C422E659CA00F09A79 /* Build configuration list for PBXProject "Konnex" */;
+			buildConfigurationList = 79A8A6C422E659CA00F09A79 /* Build configuration list for PBXProject "Konnex-Manager" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -272,9 +272,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				79A8A6C822E659CA00F09A79 /* Konnex */,
-				79A8A6DC22E659CC00F09A79 /* KonnexTests */,
-				79A8A6E722E659CC00F09A79 /* KonnexUITests */,
+				79A8A6C822E659CA00F09A79 /* Konnex-Manager */,
+				79A8A6DC22E659CC00F09A79 /* Konnex-ManagerTests */,
+				79A8A6E722E659CC00F09A79 /* Konnex-ManagerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -351,12 +351,12 @@
 /* Begin PBXTargetDependency section */
 		79A8A6DF22E659CC00F09A79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 79A8A6C822E659CA00F09A79 /* Konnex */;
+			target = 79A8A6C822E659CA00F09A79 /* Konnex-Manager */;
 			targetProxy = 79A8A6DE22E659CC00F09A79 /* PBXContainerItemProxy */;
 		};
 		79A8A6EA22E659CC00F09A79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 79A8A6C822E659CA00F09A79 /* Konnex */;
+			target = 79A8A6C822E659CA00F09A79 /* Konnex-Manager */;
 			targetProxy = 79A8A6E922E659CC00F09A79 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -570,7 +570,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Konnex.app/Konnex";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Konnex-Manager.app/Konnex-Manager";
 			};
 			name = Debug;
 		};
@@ -591,7 +591,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Konnex.app/Konnex";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Konnex-Manager.app/Konnex-Manager";
 			};
 			name = Release;
 		};
@@ -638,7 +638,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		79A8A6C422E659CA00F09A79 /* Build configuration list for PBXProject "Konnex" */ = {
+		79A8A6C422E659CA00F09A79 /* Build configuration list for PBXProject "Konnex-Manager" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				79A8A6EF22E659CC00F09A79 /* Debug */,
@@ -647,7 +647,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		79A8A6F122E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex" */ = {
+		79A8A6F122E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex-Manager" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				79A8A6F222E659CC00F09A79 /* Debug */,
@@ -656,7 +656,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		79A8A6F422E659CC00F09A79 /* Build configuration list for PBXNativeTarget "KonnexTests" */ = {
+		79A8A6F422E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex-ManagerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				79A8A6F522E659CC00F09A79 /* Debug */,
@@ -665,7 +665,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		79A8A6F722E659CC00F09A79 /* Build configuration list for PBXNativeTarget "KonnexUITests" */ = {
+		79A8A6F722E659CC00F09A79 /* Build configuration list for PBXNativeTarget "Konnex-ManagerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				79A8A6F822E659CC00F09A79 /* Debug */,

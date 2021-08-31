@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "79A8A6C822E659CA00F09A79"
-               BuildableName = "Konnex.app"
-               BlueprintName = "Konnex"
-               ReferencedContainer = "container:Konnex.xcodeproj">
+               BuildableName = "Konnex-Manager.app"
+               BlueprintName = "Konnex-Manager"
+               ReferencedContainer = "container:Konnex-Manager.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -31,9 +31,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "79A8A6C822E659CA00F09A79"
-            BuildableName = "Konnex.app"
-            BlueprintName = "Konnex"
-            ReferencedContainer = "container:Konnex.xcodeproj">
+            BuildableName = "Konnex-Manager.app"
+            BlueprintName = "Konnex-Manager"
+            ReferencedContainer = "container:Konnex-Manager.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -42,9 +42,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "79A8A6DC22E659CC00F09A79"
-               BuildableName = "KonnexTests.xctest"
-               BlueprintName = "KonnexTests"
-               ReferencedContainer = "container:Konnex.xcodeproj">
+               BuildableName = "Konnex-ManagerTests.xctest"
+               BlueprintName = "Konnex-ManagerTests"
+               ReferencedContainer = "container:Konnex-Manager.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -52,9 +52,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "79A8A6E722E659CC00F09A79"
-               BuildableName = "KonnexUITests.xctest"
-               BlueprintName = "KonnexUITests"
-               ReferencedContainer = "container:Konnex.xcodeproj">
+               BuildableName = "Konnex-ManagerUITests.xctest"
+               BlueprintName = "Konnex-ManagerUITests"
+               ReferencedContainer = "container:Konnex-Manager.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -74,9 +74,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "79A8A6C822E659CA00F09A79"
-            BuildableName = "Konnex.app"
-            BlueprintName = "Konnex"
-            ReferencedContainer = "container:Konnex.xcodeproj">
+            BuildableName = "Konnex-Manager.app"
+            BlueprintName = "Konnex-Manager"
+            ReferencedContainer = "container:Konnex-Manager.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -91,9 +91,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "79A8A6C822E659CA00F09A79"
-            BuildableName = "Konnex.app"
-            BlueprintName = "Konnex"
-            ReferencedContainer = "container:Konnex.xcodeproj">
+            BuildableName = "Konnex-Manager.app"
+            BlueprintName = "Konnex-Manager"
+            ReferencedContainer = "container:Konnex-Manager.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
