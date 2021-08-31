@@ -110,9 +110,9 @@
 		79A8A6C022E659CA00F09A79 = {
 			isa = PBXGroup;
 			children = (
-				79A8A6CB22E659CA00F09A79 /* Konnex */,
-				79A8A6E022E659CC00F09A79 /* KonnexTests */,
-				79A8A6EB22E659CC00F09A79 /* KonnexUITests */,
+				79A8A6CB22E659CA00F09A79 /* Konnex-Manager */,
+				79A8A6E022E659CC00F09A79 /* Konnex-ManagerTests */,
+				79A8A6EB22E659CC00F09A79 /* Konnex-ManagerUITests */,
 				79A8A6CA22E659CA00F09A79 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -127,7 +127,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		79A8A6CB22E659CA00F09A79 /* Konnex */ = {
+		79A8A6CB22E659CA00F09A79 /* Konnex-Manager */ = {
 			isa = PBXGroup;
 			children = (
 				79CB9AEE23E8B4C1005295CA /* Konnex.entitlements */,
@@ -152,25 +152,25 @@
 				7943633D26D83D4B00195D65 /* HelpSlide.xib */,
 				7943633F26D83DBC00195D65 /* HelpSlide.swift */,
 			);
-			path = Konnex;
+			path = "Konnex-Manager";
 			sourceTree = "<group>";
 		};
-		79A8A6E022E659CC00F09A79 /* KonnexTests */ = {
+		79A8A6E022E659CC00F09A79 /* Konnex-ManagerTests */ = {
 			isa = PBXGroup;
 			children = (
 				79A8A6E122E659CC00F09A79 /* KonnexTests.swift */,
 				79A8A6E322E659CC00F09A79 /* Info.plist */,
 			);
-			path = KonnexTests;
+			path = "Konnex-ManagerTests";
 			sourceTree = "<group>";
 		};
-		79A8A6EB22E659CC00F09A79 /* KonnexUITests */ = {
+		79A8A6EB22E659CC00F09A79 /* Konnex-ManagerUITests */ = {
 			isa = PBXGroup;
 			children = (
 				79A8A6EC22E659CC00F09A79 /* KonnexUITests.swift */,
 				79A8A6EE22E659CC00F09A79 /* Info.plist */,
 			);
-			path = KonnexUITests;
+			path = "Konnex-ManagerUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
