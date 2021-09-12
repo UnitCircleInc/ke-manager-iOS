@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+
+convert KonnexLogo.png -gravity North -chop 0x115 -gravity South -chop 0x696 -gravity East  -chop 405x0 -gravity West  -chop 406x0 KonnexNoText.png
+
+convert KonnexNoText.png -resize 120x120 -density 72 -units PixelsPerInch Konnex-120x120.png
+convert KonnexNoText.png -resize 167x167 -density 72 -units PixelsPerInch Konnex-167x167.png
+convert KonnexNoText.png -resize 152x152 -density 72 -units PixelsPerInch Konnex-152x152.png
+convert KonnexNoText.png -resize 1024x1024 -density 72 -units PixelsPerInch Konnex-1024x1024.png
+
+convert KonnexLogo.png -resize 1024x1024 -background white -alpha remove -density 72 -units PixelsPerInch Konnex-1024x1024.png
+
+

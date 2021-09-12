@@ -1,23 +1,23 @@
 {
   "images" : [
     {
+      "filename" : "Konnex-1024x1024.png",
       "idiom" : "universal",
-      "filename" : "KonnexIcon1.png",
       "scale" : "1x"
     },
     {
+      "filename" : "Konnex-1024x1024-1.png",
       "idiom" : "universal",
-      "filename" : "KonnexIcon1-1.png",
       "scale" : "2x"
     },
     {
+      "filename" : "Konnex-1024x1024-2.png",
       "idiom" : "universal",
-      "filename" : "KonnexIcon1-2.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }

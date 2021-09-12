@@ -27,6 +27,26 @@ $ cairosvg battery25.svg --output-width 45 --output-height 25 -o battery25.png
 $ cairosvg battery25.svg --output-width 90 --output-height 50 -o battery25@2.png
 $ cairosvg battery25.svg --output-width 135 --output-height 75 -o battery25@3.png
 
+
+
+convert -resize 120x120 Konnex.png Konnex-120x120.png
+convert -resize 167x167 Konnex.png Konnex-167x167.png
+convert -resize 152x152 Konnex.png Konnex-152x152.png
+convert -resize 1024x1024 Konnex.png Konnex-1024x1024.png
+convert -resize 1024x1024 Konnex.png Konnex-1024x1024.png
+
+#convert -resize 1024x1024 -alpha off Konnex.png Konnex-1024x1024.png
+#convert -resize 1024x1024 -alpha off -background white Konnex.png Konnex-1024x1024.png
+#convert -resize 1024x1024 -background white Konnex.png Konnex-1024x1024.png
+#convert -resize 1024x1024 -background white Konnex.png -alpha off Konnex-1024x1024.png
+#convert -resize 1024x1024 -background white Konnex.png -alpha remove Konnex-1024x1024.png
+#convert -resize 1024x1024 -background white Konnex.png Konnex-1024x1024.png
+#convert -resize 1024x1024 -background white -alpha remove Konnex.png Konnex-1024x1024.png
+#convert -resize 1024x1024 -background red -alpha remove Konnex.png Konnex-1024x1024.png
+convert -resize 1024x1024 -background white -alpha remove Konnex.png Konnex-1024x1024.png
+
+
+
 ```
 
 > Notes:

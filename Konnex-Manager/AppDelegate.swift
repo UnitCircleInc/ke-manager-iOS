@@ -685,7 +685,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
                 if result.count == 1 && result[0] == UInt8(ascii: "O") {
                     os_log(.default, log: appLogger, "We oppend it!")
                     guard let lora_mac = peripheral.lora_mac(),
-                          let unlockKey = findKeyForLock(lora_mac.encodeHex()) else {
+                          let _ = findKeyForLock(lora_mac.encodeHex()) else {
                         os_log(.error, log: appLogger, "Peripheral has no mac")
                         state = .waitForConnect
                         peripheral.disconnect(UcBleError.protocolError)
@@ -718,7 +718,7 @@ extension AppDelegate: UcBlePeripheralDelegate {
     }
     func didDisconnect(_ peripheral: UcBlePeripheral, error: Error?) {
         guard let lora_mac = peripheral.lora_mac(),
-              let unlockKey = findKeyForLock(lora_mac.encodeHex()) else {
+              let _ = findKeyForLock(lora_mac.encodeHex()) else {
             os_log(.error, log: appLogger, "Peripheral has no mac")
             state = .waitForConnect
             keyPair = Box.KeyPair(publicKey: Bytes([]), secretKey: Bytes([]))
