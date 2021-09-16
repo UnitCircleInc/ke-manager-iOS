@@ -352,7 +352,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
                 return false
         }
-        process_invite(components.path.removePrefix("/device/"))
+        process_invite(components.path.removePrefix("/manager/"))
         return true
     }
     
@@ -366,6 +366,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return
         }
         let reqdata: [String: Any] = ["apn-token": push, "token": dectoken]
+        os_log(.default, log: appLogger, "Process Invite APN: %{public}s", reqdata.debugDescription)
         let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
         let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
         os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/sites data: %{public}s", Data(enc_req).encodeHex())
