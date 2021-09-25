@@ -165,6 +165,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var units: [String: [String: UnitDesc]] = [:]
     var urlTasks: [URLSessionTask] = []
     var backgroundCompletionHandler: (() -> Void)?
+    var inviteToken: Data?
 
     var window: UIWindow?
     private lazy var session: URLSession = {
@@ -191,6 +192,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         os_log(.default, log: appLogger, "application:didFinishLaunchingWithOptions: %{public}s", launchOptions?.description ?? "Null")
         UcBleCentral.sharedInstance.delegate = self
+   
+        let userActivityOption = launchOptions?[.userActivityType]
+        if let userActivity = userActivityOption as? NSUserActivity,
+            let url  = userActivity.webpageURL,
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+            let token = Data(base64URLEncoded: components.path.removePrefix("/manager/")) {
+            inviteToken = token
+            os_log(.default, log: appLogger, "application:didFinishLaunchingWithOptions: token: %{public}s", inviteToken!.encodeHex())
+        }
+        else {
+            inviteToken = nil
+        }
+        
         registerForPushNotifications()
         
         let notificationOption = launchOptions?[.remoteNotification]
@@ -198,13 +212,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let aps = notification["aps"] as? [String: AnyObject] {
             os_log(.default, log: appLogger, "notification aps: %{public}s", aps.description)
         }
-        
-        let userActivityOption = launchOptions?[.userActivityType]
-        if let userActivity = userActivityOption as? NSUserActivity,
-            let url  = userActivity.webpageURL,
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
-            process_invite(components.path.removePrefix("/device/"))
-        }
+ 
         return true
     }
 
@@ -276,10 +284,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        os_log(.default, log: appLogger, "Device Token: %{public}s", deviceToken.encodeHex())
-        pushToken = deviceToken
-        
+    func restoreSigningKeys() {
         let tag = "com.konnexexterprises.keys".data(using: .utf8)!
         let query : [String: Any] = [
             kSecClass as String : kSecClassKey,
@@ -322,6 +327,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         default:
             os_log(.default, log: appLogger, "Unexpected return value for SecItemCopyMatching")
         }
+    }
+    
+    func signingPk() -> Bytes {
+        if phone_pk == nil {
+            restoreSigningKeys()
+        }
+        return phone_pk!
+    }
+    
+    func signingSk() -> Bytes {
+        if phone_pk == nil {
+            restoreSigningKeys()
+        }
+        return phone_sk!
+    }
+    
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        os_log(.default, log: appLogger, "Device Token: %{public}s", deviceToken.encodeHex())
+        pushToken = deviceToken
         requestSites()
     }
     
@@ -330,6 +355,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        os_log(.default, log: appLogger, "didReceiveRemoteNotification: %{public}s", userInfo.description)
         guard let aps = userInfo["aps"] as? [String: AnyObject] else {
             completionHandler(.failed)
             return
@@ -352,38 +378,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
                 return false
         }
-        process_invite(components.path.removePrefix("/manager/"))
+        
+        if  let token = Data(base64URLEncoded: components.path.removePrefix("/manager/")) {
+            inviteToken = token
+            os_log(.default, log: appLogger, "application:userActivity:restorationHandler token: %{public}s", inviteToken!.encodeHex())
+        }
+        else {
+            inviteToken = nil
+        }
+        requestSites()
         return true
     }
     
-    func process_invite(_ token: String) {
-        guard let dectoken = Data(base64URLEncoded: token) else {
-            os_log(.default, log: appLogger, "unable to decode token %{public}s", token)
-            return
-        }
+    func requestSites() {
         guard let push = pushToken else {
             os_log(.default, log: appLogger, "unable to process invote - we don't have pushid yet")
             return
         }
-        let reqdata: [String: Any] = ["apn-token": push, "token": dectoken]
+        var reqdata: [String: Any] = [:]
+        if let token = inviteToken {
+            reqdata = ["apn-token": push, "token": token]
+        }
+        inviteToken = nil
         os_log(.default, log: appLogger, "Process Invite APN: %{public}s", reqdata.debugDescription)
-        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: signingSk())!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(signingPk()), "data": Data(signed_reqdata)])
         os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/sites data: %{public}s", Data(enc_req).encodeHex())
         let url = URL(string: "https://www.qubyte.ca/api/v1/sites")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.httpBody = enc_req.encodeZ85().data(using: .utf8)
         let task = session.downloadTask(with: req)
-        task.taskDescription = "keys"
+        task.taskDescription = "sites"
         urlTasks.append(task)
         task.resume()
     }
         
     func requestMaster(_ locks: [String]) {
         let reqdata: [String: Any] = ["locks": locks]
-        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: signingSk())!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(signingPk()), "data": Data(signed_reqdata)])
         os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/request-master data: %{public}s", Data(enc_req).encodeHex())
         let url = URL(string: "https://www.qubyte.ca/api/v1/request-master")!
         var req = URLRequest(url: url)
@@ -398,8 +432,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func assignLockToUnit(_ unit: Unit, lock: Lock) {
         let reqdata: [String: Any] = ["corp": unit.corp, "site": unit.site, "unit": unit.unit, "lock": lock.lock]
-        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: signingSk())!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(signingPk()), "data": Data(signed_reqdata)])
         os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/ data: %{public}s", Data(enc_req).encodeHex())
         let url = URL(string: "https://www.qubyte.ca/api/v1/assign")!
         var req = URLRequest(url: url)
@@ -413,8 +447,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func requestUnits() {
         let reqdata: [String: Any] = [:]
-        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
+        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: signingSk())!
+        let enc_req = try! CBOR.encode(["phone-pk": Data(signingPk()), "data": Data(signed_reqdata)])
         os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/units data: %{public}s", Data(enc_req).encodeHex())
         let url = URL(string: "https://www.qubyte.ca/api/v1/units")!
         var req = URLRequest(url: url)
@@ -425,21 +459,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         urlTasks.append(task)
         task.resume()
     }
-    
-    func requestSites() {
-        let reqdata: [String: Any] = [:]
-        let signed_reqdata = try! sodium.sign.sign(message: Bytes(CBOR.encode(reqdata)), secretKey: phone_sk!)!
-        let enc_req = try! CBOR.encode(["phone-pk": Data(phone_pk!), "data": Data(signed_reqdata)])
-        os_log(.default, log: appLogger, "POST https://www.qubyte.ca/api/v1/sites data: %{public}s", Data(enc_req).encodeHex())
-        let url = URL(string: "https://www.qubyte.ca/api/v1/sites")!
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.httpBody = enc_req.encodeZ85().data(using: .utf8)
-        let task = session.downloadTask(with: req)
-        task.taskDescription = "sites"
-        urlTasks.append(task)
-        task.resume()
-    }
+
 }
 
 extension AppDelegate: UcBleCentralDelegate {
@@ -666,10 +686,10 @@ extension AppDelegate: UcBlePeripheralDelegate {
         case .waitForSigningNonce:
             counter += 1
             if let unlock_nonce = sodium.box.open(authenticatedCipherText: Bytes(data), senderPublicKey: Array(lock_em_pk), recipientSecretKey: keyPair.secretKey, nonce: Bytes(lock_nonce + packUInt64(counter))) {
-                let sig = sodium.sign.sign(message: unlock_nonce, secretKey: phone_sk!)!
+                let sig = sodium.sign.sign(message: unlock_nonce, secretKey: signingSk())!
                 os_log(.default, log: appLogger, "sig: %{public}s", Data(sig).encodeHex())
-                os_log(.default, log: appLogger, "pk: %{public}s", Data(phone_pk!).encodeHex())
-                os_log(.default, log: appLogger, "sk: %{public}s", Data(phone_sk!).encodeHex())
+                os_log(.default, log: appLogger, "pk: %{public}s", Data(signingPk()).encodeHex())
+                os_log(.default, log: appLogger, "sk: %{public}s", Data(signingSk()).encodeHex())
                 peripheral.send(Data(sodium.box.seal(message: sig, recipientPublicKey: Array(lock_em_pk), senderSecretKey: keyPair.secretKey, nonce: Bytes(phone_nonce + packUInt64(counter)))!))
                 state = .waitForUnlockOk
                 
